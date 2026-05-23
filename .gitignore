@@ -150,6 +150,8 @@ activemq-data/
 # Environments
 .env
 .envrc
+.firebaserc
+.firebase/
 .venv
 env/
 venv/
@@ -216,3 +218,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Node
+node_modules/
+
+# BlueLock project
+bluelock.db
+bin/

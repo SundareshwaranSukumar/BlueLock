@@ -11,10 +11,11 @@
   },
   "scripts": {
     "prebuild": "node ../scripts/ensure-node.mjs --quiet",
-    "prebuild:firebase": "node ../scripts/ensure-node.mjs --quiet",
+    "prebuild:production": "node ../scripts/ensure-node.mjs --quiet",
     "dev": "vite dev",
     "build": "vite build",
-    "build:firebase": "vite build && node ../scripts/generate-firebase-index.mjs",
+    "build:production": "vite build --mode production && node ../scripts/generate-static-index.mjs",
+    "build:firebase": "npm run build:production",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",

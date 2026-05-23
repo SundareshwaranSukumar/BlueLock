@@ -1,6 +1,6 @@
 # BlueLock Backend
 
-FastAPI command grid for gate orchestration, Gemini-powered stadium guidance, and director bypass control. Pairs with the TanStack Start frontend in `../frontend/`.
+FastAPI command grid for gate orchestration, SQLite seat inventory, Gemini-powered stadium guidance, Google Routes traffic sampling, and director bypass control. Pairs with the TanStack Start frontend in `../frontend/`.
 
 Monorepo docs: [../docs/](../docs/) · API integration: [../docs/api-integration.md](../docs/api-integration.md)
 
@@ -8,9 +8,13 @@ Monorepo docs: [../docs/](../docs/) · API integration: [../docs/api-integration
 
 ```
 backend/
-├── config/database.py           # In-memory gate state
+├── config/
+│   ├── database.py              # SQLAlchemy + Ekana seat seed
+│   ├── gate_state.py            # In-memory gate load for routing
+│   └── match_config.py          # LSG vs PBKS / Ekana constants
 ├── controllers/                 # Domain use cases
 ├── models/
+│   ├── db_models.py             # SeatStatus, UserTicket
 │   ├── schemas.py               # Native API contracts
 │   └── frontend_contracts.py    # TanStack client contracts
 ├── routes/
@@ -18,9 +22,11 @@ backend/
 │   └── request_utils.py
 ├── services/
 │   ├── gemini_service.py
-│   └── frontend_adapter.py      # UI gate A–D ↔ backend N-A, E-A, …
+│   ├── google_traffic_service.py
+│   ├── traffic_service.py       # WebSocket telemetry loop
+│   └── frontend_adapter.py      # UI gate A–D ↔ backend GATE-A, GATE-B, …
 ├── main.py
-├── Dockerfile
+├── Dockerfile                   # Used by root Dockerfile for Cloud Run
 └── pyproject.toml               # Ruff + Mypy config
 ```
 
@@ -40,6 +46,11 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 | Health | `GET http://localhost:8000/health` |
 | OpenAPI | `http://localhost:8000/docs` |
 
+## Ticketing flow
+
+1. `POST /api/v1/seats/lock` — seat must be `Available`
+2. `POST /api/v1/tickets/book` — seat `Available` or `Locked` → `Booked`, persists `UserTicket`, returns gate assignment + QR PNG (base64) + mock Wallet URL
+
 ## Dual API contracts
 
 The same paths accept **either** payload shape (auto-detected from JSON keys):
@@ -57,6 +68,9 @@ See [../docs/api-integration.md](../docs/api-integration.md) for field mapping.
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `GEMINI_API_KEY` | For AI routes | Google GenAI API key |
+| `GOOGLE_MAPS_API_KEY` | No | Routes API traffic; synthetic fallback if unset |
+| `CRICAPI_KEY` / `RAPIDAPI_KEY` | No | Live cricket scores |
+| `DATABASE_URL` | No | Default SQLite file `bluelock.db` |
 | `CORS_ORIGINS` | No | Comma-separated origins; default `*` |
 | `APP_ENV` | No | `development` / `production` |
 | `PORT` | Cloud Run | Default `8080` in container |
@@ -71,11 +85,11 @@ From repository root:
 .\scripts\check-static.ps1
 ```
 
-Runs Ruff, Mypy (backend), and `npm run build:firebase` (frontend).
+Runs Ruff, Mypy (backend), ESLint, and `npm run build:production` (frontend).
 
 ## Deploy
 
-Cloud Run and Firebase steps live in [../docs/deployment.md](../docs/deployment.md). Deploy scripts: `../scripts/deploy-firebase.*`, `../scripts/launch.*`.
+Cloud Run steps live in [../docs/deployment.md](../docs/deployment.md). Deploy scripts: `../scripts/deploy-gcp.*`, `../scripts/launch.*` (option 2).
 
 ## License
 

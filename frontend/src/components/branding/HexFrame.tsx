@@ -33,11 +33,7 @@ export function HexIcon({ size = 28, className }: { size?: number; className?: s
         stroke="currentColor"
         strokeWidth="3"
       />
-      <polygon
-        points="40,20 60,20 78,50 60,80 40,80 22,50"
-        fill="currentColor"
-        opacity="0.15"
-      />
+      <polygon points="40,20 60,20 78,50 60,80 40,80 22,50" fill="currentColor" opacity="0.15" />
     </svg>
   );
 }

@@ -1,3 +1,4 @@
+# Local development only — production deploy uses scripts/deploy-gcp.* (Cloud Run).
 services:
   backend:
     build:

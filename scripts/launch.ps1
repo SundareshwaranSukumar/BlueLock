@@ -1,6 +1,6 @@
 # BlueLock interactive launcher (Windows PowerShell)
 param(
-    [ValidateSet("local", "gcp", "frontend", "backend", "containers", "health", "menu")]
+    [ValidateSet("local", "gcp", "firebase", "frontend", "backend", "containers", "health", "menu")]
     [string]$Action = "menu"
 )
 
@@ -14,7 +14,8 @@ function Write-Menu {
     Write-Host ""
     Write-Host "BlueLock Launcher" -ForegroundColor Cyan
     Write-Host "  1) Local full stack (Docker backend + frontend dev)"
-    Write-Host "  2) Deploy GCP (Cloud Run backend + Firebase hosting)"
+    Write-Host "  2) Deploy GCP (Cloud Run — backend + frontend)"
+    Write-Host "  2b) Deploy Firebase (Cloud Run backend + Hosting)"
     Write-Host "  3) Frontend only"
     Write-Host "  4) Backend only"
     Write-Host "  5) Validate Docker containers"
@@ -111,27 +112,18 @@ function Build-All {
 }
 
 function Deploy-Gcp {
-    Write-Host "GCP deploy requires gcloud + firebase CLI and configured project." -ForegroundColor Cyan
-    $project = Read-Host "GCP project id"
-    $region = Read-Host "Cloud Run region [us-central1]"
-    if (-not $region) { $region = "us-central1" }
+    & (Join-Path $Root "scripts\deploy-gcp.ps1")
+}
 
-    Set-Location $Root
-    docker compose build backend
-    $image = "gcr.io/$project/bluelock-backend:latest"
-    docker tag bluelock-backend:latest $image 2>$null
-    if (-not $?) {
-        $image = "${region}-docker.pkg.dev/${project}/bluelock/backend:latest"
-        Write-Host "Tag and push to Artifact Registry: $image"
-    }
-    Write-Host "Run: gcloud run deploy bluelock-backend --image $image --region $region --allow-unauthenticated"
-    & (Join-Path $Root "scripts\deploy-firebase.ps1") -ProjectId $project
+function Deploy-Firebase {
+    & (Join-Path $Root "scripts\deploy-firebase-full.ps1")
 }
 
 function Invoke-Action([string]$choice) {
     switch ($choice) {
         "1" { "local" }
         "2" { "gcp" }
+        "2b" { "firebase" }
         "3" { "frontend" }
         "4" { "backend" }
         "5" { "containers" }
@@ -148,6 +140,7 @@ function Invoke-Action([string]$choice) {
                 Start-Frontend
             }
             "gcp" { Deploy-Gcp }
+            "firebase" { Deploy-Firebase }
             "frontend" { Start-Frontend }
             "backend" {
                 if (Get-Command docker -ErrorAction SilentlyContinue) { Start-BackendDocker }

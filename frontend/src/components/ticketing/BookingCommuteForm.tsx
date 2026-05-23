@@ -17,7 +17,9 @@ export function BookingCommuteForm() {
   return (
     <div className="hex-frame rounded-md p-5 space-y-4">
       <label className="block">
-        <span className="font-hud text-[10px] tracking-[0.3em] text-muted-foreground">DISPLAY NAME</span>
+        <span className="font-hud text-[10px] tracking-[0.3em] text-muted-foreground">
+          DISPLAY NAME
+        </span>
         <input
           className="mt-1 w-full bg-background border border-border rounded-sm px-3 py-2"
           value={userName}
@@ -26,7 +28,9 @@ export function BookingCommuteForm() {
         />
       </label>
       <label className="block">
-        <span className="font-hud text-[10px] tracking-[0.3em] text-muted-foreground">STARTING LOCATION</span>
+        <span className="font-hud text-[10px] tracking-[0.3em] text-muted-foreground">
+          STARTING LOCATION
+        </span>
         <input
           className="mt-1 w-full bg-background border border-border rounded-sm px-3 py-2"
           value={startingLocation}
@@ -35,7 +39,9 @@ export function BookingCommuteForm() {
         />
       </label>
       <div>
-        <span className="font-hud text-[10px] tracking-[0.3em] text-muted-foreground">TRANSPORT MODE</span>
+        <span className="font-hud text-[10px] tracking-[0.3em] text-muted-foreground">
+          TRANSPORT MODE
+        </span>
         <div className="mt-2 flex flex-wrap gap-2">
           {TRANSPORTS.map((t) => (
             <button
@@ -43,7 +49,11 @@ export function BookingCommuteForm() {
               type="button"
               onClick={() => setTransportMode(t)}
               className="hex-frame px-3 py-1.5 font-hud text-[10px] tracking-[0.2em] uppercase"
-              style={transportMode === t ? { borderColor: "var(--color-cyan)", color: "var(--color-cyan)" } : undefined}
+              style={
+                transportMode === t
+                  ? { borderColor: "var(--color-cyan)", color: "var(--color-cyan)" }
+                  : undefined
+              }
             >
               {t}
             </button>
@@ -51,7 +61,9 @@ export function BookingCommuteForm() {
         </div>
       </div>
       <div>
-        <span className="font-hud text-[10px] tracking-[0.3em] text-muted-foreground">TEAM ALLEGIANCE</span>
+        <span className="font-hud text-[10px] tracking-[0.3em] text-muted-foreground">
+          TEAM ALLEGIANCE
+        </span>
         <div className="mt-2 flex gap-3">
           {([MATCH_HOME, MATCH_AWAY] as const).map((t) => (
             <button

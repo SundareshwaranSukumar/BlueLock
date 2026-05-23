@@ -29,8 +29,23 @@ export function IsoStadium() {
         </defs>
 
         {/* Outer ring */}
-        <ellipse cx="400" cy="260" rx="360" ry="200" fill="url(#stand)" stroke="oklch(0.85 0.18 220 / 0.3)" strokeWidth="1" />
-        <ellipse cx="400" cy="260" rx="300" ry="160" fill="oklch(0.18 0.05 260)" stroke="oklch(0.85 0.18 220 / 0.2)" />
+        <ellipse
+          cx="400"
+          cy="260"
+          rx="360"
+          ry="200"
+          fill="url(#stand)"
+          stroke="oklch(0.85 0.18 220 / 0.3)"
+          strokeWidth="1"
+        />
+        <ellipse
+          cx="400"
+          cy="260"
+          rx="300"
+          ry="160"
+          fill="oklch(0.18 0.05 260)"
+          stroke="oklch(0.85 0.18 220 / 0.2)"
+        />
 
         {/* Sectors */}
         {Array.from({ length: 16 }).map((_, i) => {
@@ -39,24 +54,73 @@ export function IsoStadium() {
           const y1 = 260 + Math.sin(a) * 160;
           const x2 = 400 + Math.cos(a) * 360;
           const y2 = 260 + Math.sin(a) * 200;
-          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="oklch(0.85 0.18 220 / 0.25)" strokeWidth="1" />;
+          return (
+            <line
+              key={i}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="oklch(0.85 0.18 220 / 0.25)"
+              strokeWidth="1"
+            />
+          );
         })}
 
         {/* Pitch */}
         <ellipse cx="400" cy="260" rx="240" ry="120" fill="url(#pitch)" />
-        <rect x="370" y="240" width="60" height="40" fill="oklch(0.85 0.7 90 / 0.18)" stroke="oklch(0.98 0.005 240)" strokeOpacity="0.4" />
+        <rect
+          x="370"
+          y="240"
+          width="60"
+          height="40"
+          fill="oklch(0.85 0.7 90 / 0.18)"
+          stroke="oklch(0.98 0.005 240)"
+          strokeOpacity="0.4"
+        />
         <circle cx="400" cy="260" r="6" fill="oklch(0.98 0.005 240)" opacity="0.6" />
 
         {/* Stand labels */}
-        <text x="400" y="55"  textAnchor="middle" className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>NORTH BLOCK</text>
-        <text x="770" y="265" textAnchor="end"    className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>EAST LOUNGE</text>
-        <text x="400" y="475" textAnchor="middle" className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>SOUTH BLOCK</text>
-        <text x="30"  y="265"                       className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>WEST TERRACE</text>
+        <text
+          x="400"
+          y="55"
+          textAnchor="middle"
+          className="fill-foreground"
+          style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}
+        >
+          NORTH BLOCK
+        </text>
+        <text
+          x="770"
+          y="265"
+          textAnchor="end"
+          className="fill-foreground"
+          style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}
+        >
+          EAST LOUNGE
+        </text>
+        <text
+          x="400"
+          y="475"
+          textAnchor="middle"
+          className="fill-foreground"
+          style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}
+        >
+          SOUTH BLOCK
+        </text>
+        <text
+          x="30"
+          y="265"
+          className="fill-foreground"
+          style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}
+        >
+          WEST TERRACE
+        </text>
 
         {/* Gate halos */}
-        <GateHalo gate={gateMap.A} cx={400} cy={60}  />
+        <GateHalo gate={gateMap.A} cx={400} cy={60} />
         <GateHalo gate={gateMap.B} cx={740} cy={260} />
-        <GateHalo gate={gateMap.C} cx={60}  cy={260} />
+        <GateHalo gate={gateMap.C} cx={60} cy={260} />
         <GateHalo gate={gateMap.D} cx={400} cy={460} />
 
         {/* User node */}
@@ -85,7 +149,15 @@ function GateHalo({ gate, cx, cy }: { gate: Gate; cx: number; cy: number }) {
         stroke="oklch(0.98 0.005 240)"
         strokeWidth="1"
       />
-      <text x={cx} y={cy + 4} textAnchor="middle" style={{ fontFamily: "Orbitron", fontSize: 11, fontWeight: 700 }} fill="oklch(0.13 0.04 260)">{gate.id}</text>
+      <text
+        x={cx}
+        y={cy + 4}
+        textAnchor="middle"
+        style={{ fontFamily: "Orbitron", fontSize: 11, fontWeight: 700 }}
+        fill="oklch(0.13 0.04 260)"
+      >
+        {gate.id}
+      </text>
     </g>
   );
 }

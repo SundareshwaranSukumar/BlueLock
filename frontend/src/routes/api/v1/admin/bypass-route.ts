@@ -26,16 +26,19 @@ export const Route = createFileRoute("/api/v1/admin/bypass-route")({
           const parsed = Schema.safeParse(await request.json());
           if (!parsed.success) {
             return new Response(JSON.stringify({ error: "Invalid payload" }), {
-              status: 400, headers: { "Content-Type": "application/json", ...cors },
+              status: 400,
+              headers: { "Content-Type": "application/json", ...cors },
             });
           }
           const clientsNotifiedCount = 800 + Math.floor(Math.random() * 1200);
           return new Response(JSON.stringify({ status: "DISPATCHED", clientsNotifiedCount }), {
-            status: 200, headers: { "Content-Type": "application/json", ...cors },
+            status: 200,
+            headers: { "Content-Type": "application/json", ...cors },
           });
         } catch {
           return new Response(JSON.stringify({ error: "Dispatch failed" }), {
-            status: 500, headers: { "Content-Type": "application/json", ...cors },
+            status: 500,
+            headers: { "Content-Type": "application/json", ...cors },
           });
         }
       },

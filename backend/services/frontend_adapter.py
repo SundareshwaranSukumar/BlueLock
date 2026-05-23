@@ -79,14 +79,9 @@ def _seat_stand_vector(seat_id: str) -> str:
 
 
 def _backend_gate_to_ui(gate_id: str, stand_vector: str) -> GateLetter:
-    if "A" in gate_id:
-        return "A"
-    if "B" in gate_id:
-        return "B"
-    if "C" in gate_id:
-        return "C"
-    if "D" in gate_id:
-        return "D"
+    suffix = gate_id.rsplit("-", 1)[-1]
+    if suffix in ("A", "B", "C", "D"):
+        return suffix  # type: ignore[return-value]
     return STAND_TO_UI_GATE.get(stand_vector, "A")
 
 

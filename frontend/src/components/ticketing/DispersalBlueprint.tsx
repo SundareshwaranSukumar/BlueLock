@@ -15,7 +15,12 @@ export function DispersalBlueprint() {
   }
 
   const gate = gates.find((g) => g.id === ticket.assignedGate)!;
-  const metroTone = ticket.metroLoad === "crit" ? "text-crit" : ticket.metroLoad === "warn" ? "text-warn" : "text-ok";
+  const metroTone =
+    ticket.metroLoad === "crit"
+      ? "text-crit"
+      : ticket.metroLoad === "warn"
+        ? "text-warn"
+        : "text-ok";
 
   return (
     <div className="space-y-4">
@@ -23,21 +28,35 @@ export function DispersalBlueprint() {
         <div className="bg-card/90 p-5 rounded-sm">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-hud text-[10px] tracking-[0.3em] text-cyan">// DISPERSAL BLUEPRINT</p>
+              <p className="font-hud text-[10px] tracking-[0.3em] text-cyan">
+                // DISPERSAL BLUEPRINT
+              </p>
               <h3 className="font-display text-2xl font-bold mt-1">Seat {ticket.seatId}</h3>
-              <p className="text-muted-foreground text-sm">{ticket.stand} · LSG vs PBKS · Ekana 19:30</p>
+              <p className="text-muted-foreground text-sm">
+                {ticket.stand} · LSG vs PBKS · Ekana 19:30
+              </p>
             </div>
             <HexIcon size={48} className="text-cyan" />
           </div>
 
           <div className="grid grid-cols-3 gap-3 mt-5">
             <Stat label="ENTRY CORRIDOR" value={ticket.entryCorridor} />
-            <Stat label="ASSIGNED GATE" value={`${gate.id}`} sub={`${Math.round(gate.load)}% load`} />
-            <Stat label="METRO PULSE" value={ticket.metroLoad.toUpperCase()} valueClass={metroTone} />
+            <Stat
+              label="ASSIGNED GATE"
+              value={`${gate.id}`}
+              sub={`${Math.round(gate.load)}% load`}
+            />
+            <Stat
+              label="METRO PULSE"
+              value={ticket.metroLoad.toUpperCase()}
+              valueClass={metroTone}
+            />
           </div>
 
           <div className="mt-4 hex-frame rounded-sm p-3 space-y-1">
-            <p className="font-hud text-[9px] tracking-[0.25em] text-muted-foreground">RECOMMENDED ROUTE</p>
+            <p className="font-hud text-[9px] tracking-[0.25em] text-muted-foreground">
+              RECOMMENDED ROUTE
+            </p>
             <p className="text-sm">{ticket.recommendedRoute}</p>
             <p className="text-[11px] text-cyan mt-1">{ticket.nearestTransit}</p>
           </div>
@@ -60,7 +79,17 @@ export function DispersalBlueprint() {
   );
 }
 
-function Stat({ label, value, sub, valueClass = "" }: { label: string; value: string; sub?: string; valueClass?: string }) {
+function Stat({
+  label,
+  value,
+  sub,
+  valueClass = "",
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  valueClass?: string;
+}) {
   return (
     <div className="hex-frame rounded-sm p-3">
       <p className="font-hud text-[9px] tracking-[0.25em] text-muted-foreground">{label}</p>
@@ -70,7 +99,11 @@ function Stat({ label, value, sub, valueClass = "" }: { label: string; value: st
   );
 }
 function Tag({ children }: { children: React.ReactNode }) {
-  return <span className="border border-border px-2 py-1 rounded-sm text-muted-foreground">{children}</span>;
+  return (
+    <span className="border border-border px-2 py-1 rounded-sm text-muted-foreground">
+      {children}
+    </span>
+  );
 }
 function PitchIcon() {
   return (

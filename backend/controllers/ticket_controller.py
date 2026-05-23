@@ -189,13 +189,10 @@ def _stand_vector_from_seat(seat_id: str, stand_name: str) -> str:
 
 
 def _backend_gate_to_letter(gate_id: str) -> str:
-    if "A" in gate_id:
-        return "A"
-    if "B" in gate_id:
-        return "B"
-    if "C" in gate_id:
-        return "C"
-    return "D"
+    suffix = gate_id.rsplit("-", 1)[-1]
+    if suffix in ("A", "B", "C", "D"):
+        return suffix
+    return "A"
 
 
 def _corridor_for_gate(gate: str) -> str:

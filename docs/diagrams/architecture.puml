@@ -12,49 +12,47 @@ package "Client Tier" {
   [api.ts Client] as API
 }
 
-package "Firebase Hosting (static client)" #LightYellow {
+package "Cloud Run — Frontend (nginx)" #LightYellow {
   [Static Assets\nfrontend/dist/client] as Static
-  [Rewrites /api/** → Cloud Run] as Rewrites
 }
 
-package "Google Cloud Run" #LightBlue {
-  package "FastAPI Backend" {
-    [main.py] as Main
-    [v1_routes] as Routes
-    [Controllers] as Ctrl
-    [frontend_adapter] as Adapter
-    [database.py\nIn-Memory Gates] as State
-    [gemini_service] as GeminiSvc
-  }
+package "Cloud Run — Backend (FastAPI)" #LightBlue {
+  [main.py] as Main
+  [v1_routes] as Routes
+  [Controllers] as Ctrl
+  [frontend_adapter] as Adapter
+  [SQLite + SQLAlchemy\nSeatStatus] as DB
+  [gemini_service] as GeminiSvc
+  [google_traffic_service] as TrafficSvc
 }
 
 cloud "Google GenAI" as GenAI {
-  [gemini-1.5-flash] as Model
+  [gemini-2.5-flash] as Model
+}
+
+cloud "Google Maps Platform" as Maps {
+  [Routes API\nTRAFFIC_AWARE] as Routes
 }
 
 User --> UI
 UI --> API
-API --> Static : production
-Static --> Rewrites : /api/v1/*
-Rewrites --> Routes : HTTPS
+API --> Static : production HTTPS\n(VITE_API_BASE_URL)
+Static --> Routes : /api/v1/*
 API --> Routes : dev proxy\n127.0.0.1:8000
 
 Main --> Routes
 Routes --> Ctrl
 Routes --> Adapter
 Adapter --> Ctrl
-Ctrl --> State
+Ctrl --> DB
 Ctrl --> GeminiSvc
+Ctrl --> TrafficSvc
 GeminiSvc --> Model
+TrafficSvc --> Routes
 
 note right of Adapter
   Maps UI gates A–D
   to backend N-A, E-A, …
-end note
-
-note bottom of State
-  Thread-safe gate load,
-  bypass flags, audit log
 end note
 
 @enduml
@@ -68,15 +66,15 @@ participant "StadiumSeatMap" as UI
 participant "apiClient" as Client
 participant "Vite Proxy" as Proxy
 participant "ticket_controller" as TC
-participant "database" as DB
+database "SQLite" as DB
 
 Fan -> UI : confirm seat
-UI -> Client : bookTicket()
-Client -> Proxy : POST /api/v1/tickets/book
+UI -> Client : lockSeat() then bookTicket()
+Client -> Proxy : POST /api/v1/seats/lock\nPOST /api/v1/tickets/book
 Proxy -> TC : forward JSON
-TC -> DB : increment gate load
-DB --> TC : updated gate
-TC --> Client : ticketId, gate, route
+TC -> DB : UPDATE SeatStatus\nINSERT UserTicket
+DB --> TC : committed row
+TC --> Client : ticketId, gate, QR base64
 Client --> UI : render ticket
 
 @enduml

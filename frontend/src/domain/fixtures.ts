@@ -6,24 +6,79 @@ export const MATCH_AWAY = "PBKS" as const;
 export const VENUE_LABEL = "Ekana Cricket Stadium · Lucknow";
 
 export const INITIAL_GATES: Gate[] = [
-  { id: "A", name: "Gate A — North Block", load: 42, flowRate: 90, status: "NORMAL", capacity: 100, corridor: "North", bypassActive: false },
-  { id: "B", name: "Gate B — South Block", load: 58, flowRate: 70, status: "WARNING", capacity: 100, corridor: "South", bypassActive: false },
-  { id: "C", name: "Gate C — East Lounge", load: 28, flowRate: 30, status: "NORMAL", capacity: 100, corridor: "East", bypassActive: false },
-  { id: "D", name: "Gate D — West Terrace", load: 71, flowRate: 110, status: "WARNING", capacity: 100, corridor: "West", bypassActive: false },
+  {
+    id: "A",
+    name: "Gate A — North Block",
+    load: 42,
+    flowRate: 90,
+    status: "NORMAL",
+    capacity: 100,
+    corridor: "North",
+    bypassActive: false,
+  },
+  {
+    id: "B",
+    name: "Gate B — South Block",
+    load: 58,
+    flowRate: 70,
+    status: "WARNING",
+    capacity: 100,
+    corridor: "South",
+    bypassActive: false,
+  },
+  {
+    id: "C",
+    name: "Gate C — East Lounge",
+    load: 28,
+    flowRate: 30,
+    status: "NORMAL",
+    capacity: 100,
+    corridor: "East",
+    bypassActive: false,
+  },
+  {
+    id: "D",
+    name: "Gate D — West Terrace",
+    load: 71,
+    flowRate: 110,
+    status: "WARNING",
+    capacity: 100,
+    corridor: "West",
+    bypassActive: false,
+  },
 ];
 
-export const EKANA_STANDS = [
-  "North Block",
-  "South Block",
-  "East Lounge",
-  "West Terrace",
-] as const;
+export const EKANA_STANDS = ["North Block", "South Block", "East Lounge", "West Terrace"] as const;
 
 export const STANDS = [
-  { name: "North Block", side: "north", gateId: "A" as const, transit: "Metro Red · Ekana North (350m)", parking: "P-N — North Lot" },
-  { name: "South Block", side: "south", gateId: "B" as const, transit: "Metro Red · Ekana South (420m)", parking: "P-S — South Lot" },
-  { name: "East Lounge", side: "east", gateId: "C" as const, transit: "Bus Hub · Gomti Nagar (480m)", parking: "P-E — East Lot" },
-  { name: "West Terrace", side: "west", gateId: "D" as const, transit: "Ride Pool · West Plaza (290m)", parking: "P-W — West Lot" },
+  {
+    name: "North Block",
+    side: "north",
+    gateId: "A" as const,
+    transit: "Metro Red · Ekana North (350m)",
+    parking: "P-N — North Lot",
+  },
+  {
+    name: "South Block",
+    side: "south",
+    gateId: "B" as const,
+    transit: "Metro Red · Ekana South (420m)",
+    parking: "P-S — South Lot",
+  },
+  {
+    name: "East Lounge",
+    side: "east",
+    gateId: "C" as const,
+    transit: "Bus Hub · Gomti Nagar (480m)",
+    parking: "P-E — East Lot",
+  },
+  {
+    name: "West Terrace",
+    side: "west",
+    gateId: "D" as const,
+    transit: "Ride Pool · West Plaza (290m)",
+    parking: "P-W — West Lot",
+  },
 ];
 
 const ROWS_FOR_TIER: Record<SeatTier, string[]> = {
@@ -74,25 +129,53 @@ export const PARKING_LOTS: ParkingLot[] = [
 ];
 
 export const TEAMS: TeamRow[] = [
-  { team: "Lucknow Super Giants", short: "LSG", played: 12, won: 7, lost: 5, nrr: 0.42, points: 14 },
+  {
+    team: "Lucknow Super Giants",
+    short: "LSG",
+    played: 12,
+    won: 7,
+    lost: 5,
+    nrr: 0.42,
+    points: 14,
+  },
   { team: "Punjab Kings", short: "PBKS", played: 12, won: 6, lost: 6, nrr: -0.08, points: 12 },
   { team: "Chennai Super Kings", short: "CSK", played: 12, won: 9, lost: 3, nrr: 1.21, points: 18 },
   { team: "Mumbai Indians", short: "MI", played: 12, won: 8, lost: 4, nrr: 0.84, points: 16 },
 ];
 
 export const PLAYERS: Player[] = [
-  { id: "p1", name: "Nicholas Pooran", team: "LSG", role: "WK",
+  {
+    id: "p1",
+    name: "Nicholas Pooran",
+    team: "LSG",
+    role: "WK",
     attrs: { strike: 88, control: 90, power: 92, consistency: 85, fielding: 80 },
-    phases: { powerplay: 145, middle: 128, death: 165 } },
-  { id: "p2", name: "Rishabh Pant", team: "LSG", role: "WK",
+    phases: { powerplay: 145, middle: 128, death: 165 },
+  },
+  {
+    id: "p2",
+    name: "Rishabh Pant",
+    team: "LSG",
+    role: "WK",
     attrs: { strike: 86, control: 88, power: 90, consistency: 82, fielding: 78 },
-    phases: { powerplay: 138, middle: 122, death: 158 } },
-  { id: "p3", name: "Shreyas Iyer", team: "PBKS", role: "BAT",
+    phases: { powerplay: 138, middle: 122, death: 158 },
+  },
+  {
+    id: "p3",
+    name: "Shreyas Iyer",
+    team: "PBKS",
+    role: "BAT",
     attrs: { strike: 82, control: 88, power: 84, consistency: 86, fielding: 74 },
-    phases: { powerplay: 132, middle: 118, death: 102 } },
-  { id: "p4", name: "Arshdeep Singh", team: "PBKS", role: "BOWL",
+    phases: { powerplay: 132, middle: 118, death: 102 },
+  },
+  {
+    id: "p4",
+    name: "Arshdeep Singh",
+    team: "PBKS",
+    role: "BOWL",
     attrs: { strike: 90, control: 92, power: 72, consistency: 88, fielding: 76 },
-    phases: { powerplay: 7.2, middle: 8.1, death: 9.4 } },
+    phases: { powerplay: 7.2, middle: 8.1, death: 9.4 },
+  },
 ];
 
 export const SCHEDULE = [

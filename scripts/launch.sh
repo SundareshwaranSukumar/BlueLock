@@ -11,7 +11,8 @@ menu() {
   echo ""
   echo "BlueLock Launcher"
   echo "  1) Local full stack (Docker backend + frontend dev)"
-  echo "  2) Deploy GCP (Cloud Run + Firebase) — guided"
+  echo "  2) Deploy GCP (Cloud Run) — scripts/deploy-gcp.sh"
+  echo "  2b) Deploy Firebase (backend + Hosting) — scripts/deploy-firebase-full.sh"
   echo "  3) Frontend only"
   echo "  4) Backend only"
   echo "  5) Validate Docker containers"
@@ -82,8 +83,10 @@ run_action() {
       start_frontend
       ;;
     2|gcp)
-      echo "Configure gcloud, push backend image, then:"
-      bash "$ROOT/scripts/deploy-firebase.sh"
+      bash "$ROOT/scripts/deploy-gcp.sh"
+      ;;
+    2b|firebase)
+      bash "$ROOT/scripts/deploy-firebase-full.sh"
       ;;
     3|frontend) start_frontend ;;
     4|backend)

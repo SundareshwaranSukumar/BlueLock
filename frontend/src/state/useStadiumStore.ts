@@ -1,6 +1,22 @@
 import { create } from "zustand";
-import type { ChatMessage, Directive, Gate, GateId, MatchState, ParkingLot, TelemetryPacket, UserRole, UserTicket } from "@/domain/types";
-import { INITIAL_GATES, MATCH_AWAY, MATCH_HOME, PARKING_LOTS, buildSeatMatrix } from "@/domain/fixtures";
+import type {
+  ChatMessage,
+  Directive,
+  Gate,
+  GateId,
+  MatchState,
+  ParkingLot,
+  TelemetryPacket,
+  UserRole,
+  UserTicket,
+} from "@/domain/types";
+import {
+  INITIAL_GATES,
+  MATCH_AWAY,
+  MATCH_HOME,
+  PARKING_LOTS,
+  buildSeatMatrix,
+} from "@/domain/fixtures";
 
 export type ViewId = 1 | 2 | 3 | 4 | 5;
 
@@ -114,7 +130,12 @@ export const useStadiumStore = create<StadiumState>((set, get) => ({
         gates: s.gates.map((g) => {
           const u = p.gates.find((x) => x.gateId === g.id);
           if (!u) return g;
-          return { ...g, load: u.occupancy, flowRate: u.flowRate ?? u.scansPerMin ?? g.flowRate, status: u.status };
+          return {
+            ...g,
+            load: u.occupancy,
+            flowRate: u.flowRate ?? u.scansPerMin ?? g.flowRate,
+            status: u.status,
+          };
         }),
         parkingLots: parking,
         match: {

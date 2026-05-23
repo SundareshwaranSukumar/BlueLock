@@ -19,8 +19,8 @@ export function RoleChooser() {
         </span>
       </h1>
       <p className="mt-5 max-w-xl text-center text-muted-foreground text-sm sm:text-base">
-        Choose your access tier. Fans book seats and route through the safest corridor.
-        Directors monitor the entire grid in real time.
+        Choose your access tier. Fans book seats and route through the safest corridor. Directors
+        monitor the entire grid in real time.
       </p>
 
       <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-4xl">
@@ -44,18 +44,33 @@ export function RoleChooser() {
 }
 
 function RoleCard({
-  tag, title, subtitle, accent, onClick,
-}: { tag: string; title: string; subtitle: string; accent: string; onClick: () => void }) {
+  tag,
+  title,
+  subtitle,
+  accent,
+  onClick,
+}: {
+  tag: string;
+  title: string;
+  subtitle: string;
+  accent: string;
+  onClick: () => void;
+}) {
   return (
     <button
       onClick={onClick}
       className="group relative hex-frame rounded-md p-7 text-left transition hover:-translate-y-1 hover:glow-cyan gpu"
       style={{ borderColor: accent }}
     >
-      <span className="font-hud text-[10px] tracking-[0.4em]" style={{ color: accent }}>{tag}</span>
+      <span className="font-hud text-[10px] tracking-[0.4em]" style={{ color: accent }}>
+        {tag}
+      </span>
       <h3 className="font-display text-3xl font-bold mt-3">{title}</h3>
       <p className="text-muted-foreground text-sm mt-2 max-w-sm">{subtitle}</p>
-      <div className="mt-6 flex items-center gap-2 font-hud text-[11px] tracking-[0.3em]" style={{ color: accent }}>
+      <div
+        className="mt-6 flex items-center gap-2 font-hud text-[11px] tracking-[0.3em]"
+        style={{ color: accent }}
+      >
         ENTER
         <span className="transition-transform group-hover:translate-x-1">→</span>
       </div>

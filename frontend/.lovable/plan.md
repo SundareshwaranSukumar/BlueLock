@@ -1,4 +1,3 @@
-
 # BlueLock — Execution Plan
 
 A single-page TanStack Start app with 5 views driven by a global view manager, a shared reactive store for crowd/gate state, and a Neon Egoist design system.
@@ -34,12 +33,14 @@ src/
 ```
 
 SOLID application:
+
 - SRP: each component is render-only; data lives in `useStadiumStore` + selectors.
 - OCP: components take config objects (e.g. `GateTelemetryGrid` consumes `Gate[]`).
 - ISP: small typed prop contracts in `domain/types.ts`; no god props.
 - DIP: simulation hooks (`useGateLoadSim`) inject pure updaters into the store.
 
 Performance:
+
 - `will-change-transform`, `translate-z-0`, `transform-gpu` on jumbotron ticker, isometric layers.
 - `React.memo` + zustand selector subscriptions to avoid cascade renders.
 - Animations via CSS keyframes; `prefers-reduced-motion` respected.
@@ -47,6 +48,7 @@ Performance:
 ## 2. Design System (in `src/styles.css`)
 
 Tokens (oklch equivalents of the brief):
+
 - `--background` → `#040914`, `--foreground` → `#F8FAFC`
 - `--surface-glass` `rgba(10,20,42,0.5)`, `--border-glass` `rgba(0,240,255,0.1)`
 - `--accent-cyan` `#00F0FF`, `--ok` `#1E8E3E`, `--warn` `#FBBC05`, `--crit` `#D93025`

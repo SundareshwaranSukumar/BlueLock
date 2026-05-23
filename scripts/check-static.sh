@@ -18,15 +18,22 @@ echo "=== Backend: Mypy ==="
 .venv/bin/mypy .
 cd "$ROOT"
 
-echo "=== Frontend: Production build ==="
+echo "=== Frontend: ESLint ==="
 bash "$ROOT/scripts/ensure-node.sh"
 cd frontend
 if command -v bun >/dev/null 2>&1; then
   bun install
-  bun run build:firebase
+  bun run lint
 else
   npm install
-  npm run build:firebase
+  npm run lint
+fi
+
+echo "=== Frontend: Production build ==="
+if command -v bun >/dev/null 2>&1; then
+  bun run build:production
+else
+  npm run build:production
 fi
 
 echo "All static checks passed."

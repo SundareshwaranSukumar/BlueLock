@@ -23,7 +23,9 @@ export function IntelLogConsole() {
 
   return (
     <div className="hex-frame rounded-md p-4 h-64 flex flex-col">
-      <h3 className="font-hud text-xs tracking-[0.3em] text-cyan mb-2">// GEMINI INTEL · SCROLL LOG</h3>
+      <h3 className="font-hud text-xs tracking-[0.3em] text-cyan mb-2">
+        // GEMINI INTEL · SCROLL LOG
+      </h3>
       <div className="flex-1 overflow-y-auto font-mono text-xs space-y-1 text-muted-foreground">
         {display.map((line, i) => (
           <p key={`${i}-${line.slice(0, 12)}`} className={i === 0 ? "text-cyan" : undefined}>

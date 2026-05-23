@@ -36,7 +36,9 @@ export function GateTelemetryGrid() {
       });
       telemetryService.applyBypass(g.id, target.id);
       rerouteTicket(g.id, target.id);
-      toast.success(`Directive dispatched — ${res.clientsNotifiedCount.toLocaleString()} clients notified.`);
+      toast.success(
+        `Directive dispatched — ${res.clientsNotifiedCount.toLocaleString()} clients notified.`,
+      );
     } catch (err) {
       toast.error("Bypass dispatch failed", { description: (err as Error).message });
     } finally {
@@ -53,7 +55,15 @@ export function GateTelemetryGrid() {
   );
 }
 
-function GateCard({ gate, pending, onBypass }: { gate: Gate; pending: boolean; onBypass: () => void }) {
+function GateCard({
+  gate,
+  pending,
+  onBypass,
+}: {
+  gate: Gate;
+  pending: boolean;
+  onBypass: () => void;
+}) {
   const critical = gate.status === "CRITICAL" || gate.load >= 80;
   const warn = gate.status === "WARNING";
   const color = critical ? "var(--color-crit)" : warn ? "var(--color-warn)" : "var(--color-ok)";
@@ -63,19 +73,33 @@ function GateCard({ gate, pending, onBypass }: { gate: Gate; pending: boolean; o
     <div className={cn("hex-frame rounded-md p-4 relative", critical && "animate-crit")}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="font-hud text-[10px] tracking-[0.3em] text-muted-foreground">GATE {gate.id} · {gate.corridor.toUpperCase()}</p>
+          <p className="font-hud text-[10px] tracking-[0.3em] text-muted-foreground">
+            GATE {gate.id} · {gate.corridor.toUpperCase()}
+          </p>
           <p className="font-display text-lg font-bold mt-0.5">{gate.name}</p>
         </div>
-        <span className="font-hud text-[10px] tracking-[0.25em] px-2 py-1 rounded-sm" style={{ background: color, color: "var(--color-background)" }}>{label}</span>
+        <span
+          className="font-hud text-[10px] tracking-[0.25em] px-2 py-1 rounded-sm"
+          style={{ background: color, color: "var(--color-background)" }}
+        >
+          {label}
+        </span>
       </div>
 
       <div className="mt-4">
         <div className="flex items-baseline justify-between font-hud">
-          <span className="text-3xl font-bold" style={{ color }}>{Math.round(gate.load)}%</span>
-          <span className="text-[10px] tracking-[0.25em] text-muted-foreground">FLOW {gate.flowRate}/min</span>
+          <span className="text-3xl font-bold" style={{ color }}>
+            {Math.round(gate.load)}%
+          </span>
+          <span className="text-[10px] tracking-[0.25em] text-muted-foreground">
+            FLOW {gate.flowRate}/min
+          </span>
         </div>
         <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
-          <div className="h-full transition-all" style={{ width: `${gate.load}%`, background: color, boxShadow: `0 0 10px ${color}` }} />
+          <div
+            className="h-full transition-all"
+            style={{ width: `${gate.load}%`, background: color, boxShadow: `0 0 10px ${color}` }}
+          />
         </div>
       </div>
 
@@ -90,7 +114,9 @@ function GateCard({ gate, pending, onBypass }: { gate: Gate; pending: boolean; o
         </button>
       )}
       {!critical && gate.bypassActive && (
-        <p className="mt-4 font-hud text-[10px] tracking-[0.25em] text-ok">✓ BYPASS DIRECTIVE ACTIVE · FLOW NORMALIZING</p>
+        <p className="mt-4 font-hud text-[10px] tracking-[0.25em] text-ok">
+          ✓ BYPASS DIRECTIVE ACTIVE · FLOW NORMALIZING
+        </p>
       )}
     </div>
   );

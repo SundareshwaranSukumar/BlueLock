@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * TanStack Start Cloudflare builds omit index.html.
- * Generate a Firebase Hosting entry that references hashed client assets.
+ * Generate a static hosting entry that references hashed client assets.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -12,7 +12,7 @@ const clientDir = path.join(root, "frontend", "dist", "client");
 const assetsDir = path.join(clientDir, "assets");
 
 if (!fs.existsSync(assetsDir)) {
-  console.error(`Missing ${assetsDir}. Run: cd frontend && npm run build`);
+  console.error(`Missing ${assetsDir}. Run: cd frontend && npm run build:production`);
   process.exit(1);
 }
 

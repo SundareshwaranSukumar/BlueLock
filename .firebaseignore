@@ -1,0 +1,25 @@
+# Firebase Hosting upload — only static client after build:production
+.git
+.github
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.venv
+backend
+frontend/node_modules
+frontend/src
+frontend/dist/server
+frontend/.wrangler
+.env
+backend/.env
+**/*.md
+agent-transcripts
+mcps
+scripts
+docs
+docker-compose.yml
+Dockerfile
+frontend/Dockerfile
+frontend/nginx.conf
+bin

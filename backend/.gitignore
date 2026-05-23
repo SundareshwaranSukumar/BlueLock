@@ -1,6 +1,7 @@
 .env
 .env.local
 .env.*.local
+bluelock.db
 __pycache__/
 *.py[cod]
 *$py.class

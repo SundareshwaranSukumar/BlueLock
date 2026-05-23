@@ -75,11 +75,27 @@ async function getJSON<TOut>(path: string): Promise<TOut> {
   return res.json() as Promise<TOut>;
 }
 
+function wsUrlFromApiBase(httpBase: string): string {
+  const base = httpBase.trim().replace(/\/$/, "");
+  if (base.startsWith("https://")) {
+    return `wss://${base.slice("https://".length)}/api/v1/stadium/live-stream`;
+  }
+  if (base.startsWith("http://")) {
+    return `ws://${base.slice("http://".length)}/api/v1/stadium/live-stream`;
+  }
+  return `${base}/api/v1/stadium/live-stream`;
+}
+
 export function telemetryWsUrl(): string | undefined {
   const explicit = import.meta.env.VITE_TELEMETRY_WS_URL as string | undefined;
   if (explicit?.trim()) return explicit.trim();
+
+  const apiBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
+  if (apiBase?.trim()) return wsUrlFromApiBase(apiBase);
+
   if (import.meta.env.VITE_USE_BACKEND === "true" || import.meta.env.VITE_USE_BACKEND === "1") {
-    const proto = typeof window !== "undefined" && window.location.protocol === "https:" ? "wss" : "ws";
+    const proto =
+      typeof window !== "undefined" && window.location.protocol === "https:" ? "wss" : "ws";
     const host = typeof window !== "undefined" ? window.location.host : "127.0.0.1:5173";
     return `${proto}://${host}/api/v1/stadium/live-stream`;
   }
@@ -87,10 +103,17 @@ export function telemetryWsUrl(): string | undefined {
 }
 
 export const apiClient = {
-  bookTicket: (req: BookTicketReq) => postJSON<BookTicketReq, BookTicketRes>("/api/v1/tickets/book", req),
-  lockSeat: (seatId: string) => postJSON<{ seatId: string }, { seatId: string; status: string }>("/api/v1/seats/lock", { seatId }),
-  getSeatStatus: (standName: string) => getJSON<SeatStatusRes>(`/api/v1/seats/status/${encodeURIComponent(standName)}`),
-  bypassRoute: (req: BypassReq) => postJSON<BypassReq, BypassRes>("/api/v1/admin/bypass-route", req),
-  assistant: (req: AssistantReq) => postJSON<AssistantReq, AssistantRes>("/api/v1/ai/stadium-assistant", req),
+  bookTicket: (req: BookTicketReq) =>
+    postJSON<BookTicketReq, BookTicketRes>("/api/v1/tickets/book", req),
+  lockSeat: (seatId: string) =>
+    postJSON<{ seatId: string }, { seatId: string; status: string }>("/api/v1/seats/lock", {
+      seatId,
+    }),
+  getSeatStatus: (standName: string) =>
+    getJSON<SeatStatusRes>(`/api/v1/seats/status/${encodeURIComponent(standName)}`),
+  bypassRoute: (req: BypassReq) =>
+    postJSON<BypassReq, BypassRes>("/api/v1/admin/bypass-route", req),
+  assistant: (req: AssistantReq) =>
+    postJSON<AssistantReq, AssistantRes>("/api/v1/ai/stadium-assistant", req),
   stadiumSnapshot: () => getJSON<Record<string, unknown>>("/api/v1/stadium/snapshot"),
 };

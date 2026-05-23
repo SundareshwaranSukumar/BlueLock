@@ -6,8 +6,8 @@ BlueLock follows conventions aligned with the [Google Python Style Guide](https:
 
 | Tool | Config | Command |
 |------|--------|---------|
-| **Ruff** | `backend/pyproject.toml` | `python -m ruff check backend` |
-| **Mypy** | `backend/pyproject.toml` (`strict = true`) | `python -m mypy backend` |
+| **Ruff** | `backend/pyproject.toml` | `cd backend && python -m ruff check . && python -m ruff format .` |
+| **Mypy** | `backend/pyproject.toml` (`strict = true`) | `cd backend && python -m mypy .` |
 
 Practices applied in this codebase:
 
@@ -29,10 +29,11 @@ pip install -r requirements-dev.txt
 
 | Check | Command |
 |-------|---------|
-| Production build | `cd frontend && npm run build:firebase` |
+| Production build | `cd frontend && npm run build:production` |
 | ESLint | `cd frontend && npm run lint` |
+| Prettier | `cd frontend && npm run format` |
 
-The Lovable-generated UI has Prettier formatting drift in some components; `npm run lint` may report `prettier/prettier` on files outside the integration layer. The integration files (`src/services/api.ts`, `src/lib/*`, `src/routes/api/v1/*`) follow project conventions.
+`npm run lint` must report **0 errors** (warnings from `react-refresh/only-export-components` in shadcn/ui files are acceptable). Run `npm run format` after UI edits to satisfy `prettier/prettier` rules.
 
 **Node.js:** Use **22.12.0** from repo [`.nvmrc`](../.nvmrc). `check-static.*` runs `ensure-node` before building. `frontend/package.json` sets `engines` and `engine-strict` via `.npmrc`.
 
@@ -42,4 +43,8 @@ The Lovable-generated UI has Prettier formatting drift in some components; `npm 
 ./scripts/check-static.sh
 ```
 
-Runs Ruff, Mypy, and the Firebase production build in one pass.
+```powershell
+.\scripts\check-static.ps1
+```
+
+Runs Ruff, Mypy, ESLint, and the production frontend build in one pass.

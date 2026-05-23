@@ -22,8 +22,8 @@ export function EgoistGate() {
       </h1>
 
       <p className="mt-6 max-w-xl text-center text-muted-foreground text-sm sm:text-base">
-        Crowd dispersal, gate telemetry & agentic match intelligence — a single command surface
-        for fans, operators and the director's chair.
+        Crowd dispersal, gate telemetry & agentic match intelligence — a single command surface for
+        fans, operators and the director's chair.
       </p>
 
       <div className="my-10">
@@ -31,12 +31,21 @@ export function EgoistGate() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-5">
-        <HexFrame wide tone="cyan" className="w-72 h-20 cursor-pointer group" onClick={() => setView(2)}>
+        <HexFrame
+          wide
+          tone="cyan"
+          className="w-72 h-20 cursor-pointer group"
+          onClick={() => setView(2)}
+        >
           <button className="w-full h-20 flex items-center justify-center gap-3 font-hud text-sm tracking-[0.25em] text-cyan">
             <HexIcon size={18} /> ENTER FACILITY
           </button>
         </HexFrame>
-        <HexFrame wide className="w-72 h-20 cursor-pointer hover:glow-cyan transition" onClick={() => setView(5)}>
+        <HexFrame
+          wide
+          className="w-72 h-20 cursor-pointer hover:glow-cyan transition"
+          onClick={() => setView(5)}
+        >
           <button className="w-full h-20 flex items-center justify-center gap-3 font-hud text-sm tracking-[0.25em]">
             <HexIcon size={18} /> LAUNCH CONTROL ROOM
           </button>

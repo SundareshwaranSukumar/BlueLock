@@ -93,7 +93,13 @@ export interface TelemetryPacket {
   bowling?: TeamCode;
   matchLive?: boolean;
   matchSource?: string;
-  gates: { gateId: GateId; occupancy: number; flowRate: number; status: GateStatus; scansPerMin?: number }[];
+  gates: {
+    gateId: GateId;
+    occupancy: number;
+    flowRate: number;
+    status: GateStatus;
+    scansPerMin?: number;
+  }[];
   parking?: Record<string, { capacity: number; filled: number; free: number; pct: number }>;
   transit_feed?: { mode: string; line: string; status: string; eta: string }[];
 }

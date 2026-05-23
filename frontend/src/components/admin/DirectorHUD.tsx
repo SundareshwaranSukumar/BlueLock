@@ -22,18 +22,43 @@ export function DirectorHUD() {
       <HUD label="BOOKING INTAKE" value={stats.intake.toLocaleString()} sub="last 6h" />
       <HUD label="SCAN TELEMETRY" value={`${stats.scans}/min`} sub="all gates" tone="cyan" />
       <HUD label="LIVE OCCUPANCY" value={stats.live.toLocaleString()} sub="real-time" />
-      <HUD label="AVG GATE LOAD" value={`${stats.avgLoad}%`} sub="rolling 30s"
-        tone={stats.avgLoad >= 75 ? "crit" : stats.avgLoad >= 60 ? "warn" : "ok"} />
+      <HUD
+        label="AVG GATE LOAD"
+        value={`${stats.avgLoad}%`}
+        sub="rolling 30s"
+        tone={stats.avgLoad >= 75 ? "crit" : stats.avgLoad >= 60 ? "warn" : "ok"}
+      />
     </div>
   );
 }
 
-function HUD({ label, value, sub, tone }: { label: string; value: string; sub: string; tone?: "cyan" | "crit" | "warn" | "ok" }) {
-  const color = tone === "crit" ? "var(--color-crit)" : tone === "warn" ? "var(--color-warn)" : tone === "ok" ? "var(--color-ok)" : tone === "cyan" ? "var(--color-cyan)" : undefined;
+function HUD({
+  label,
+  value,
+  sub,
+  tone,
+}: {
+  label: string;
+  value: string;
+  sub: string;
+  tone?: "cyan" | "crit" | "warn" | "ok";
+}) {
+  const color =
+    tone === "crit"
+      ? "var(--color-crit)"
+      : tone === "warn"
+        ? "var(--color-warn)"
+        : tone === "ok"
+          ? "var(--color-ok)"
+          : tone === "cyan"
+            ? "var(--color-cyan)"
+            : undefined;
   return (
     <div className="hex-frame rounded-md p-4 relative overflow-hidden">
       <p className="font-hud text-[10px] tracking-[0.3em] text-muted-foreground">{label}</p>
-      <p className="font-hud text-3xl font-bold mt-2" style={color ? { color } : undefined}>{value}</p>
+      <p className="font-hud text-3xl font-bold mt-2" style={color ? { color } : undefined}>
+        {value}
+      </p>
       <p className="text-xs text-muted-foreground mt-1">{sub}</p>
     </div>
   );

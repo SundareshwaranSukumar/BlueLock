@@ -28,8 +28,12 @@ function makeInitialSim(): SimState {
 function nextPacket(s: SimState): { state: SimState; packet: TelemetryPacket } {
   const ballsThisOver = Math.round((s.overs - Math.floor(s.overs)) * 10);
   const o = Math.floor(s.overs);
-  let no = o, nb = ballsThisOver + 1;
-  if (nb >= 6) { nb = 0; no = o + 1; }
+  let no = o,
+    nb = ballsThisOver + 1;
+  if (nb >= 6) {
+    nb = 0;
+    no = o + 1;
+  }
   const overs = parseFloat(`${no}.${nb}`);
   const liveScore = s.liveScore;
   const wickets = s.wickets;
@@ -51,7 +55,12 @@ function nextPacket(s: SimState): { state: SimState; packet: TelemetryPacket } {
     matchSource: "simulator",
     gates: (Object.keys(occ) as GateId[]).map((id) => {
       const o2 = Math.round(occ[id]);
-      return { gateId: id, occupancy: o2, flowRate: Math.round(40 + o2 * 1.6), status: statusFor(o2) };
+      return {
+        gateId: id,
+        occupancy: o2,
+        flowRate: Math.round(40 + o2 * 1.6),
+        status: statusFor(o2),
+      };
     }),
   };
   return { state: { liveScore, wickets, overs, occ }, packet };
@@ -84,12 +93,23 @@ class TelemetryService {
       try {
         this.ws = new WebSocket(url);
         this.ws.onmessage = (ev) => {
-          try { this.emit(JSON.parse(ev.data) as TelemetryPacket); } catch { /* ignore */ }
+          try {
+            this.emit(JSON.parse(ev.data) as TelemetryPacket);
+          } catch {
+            /* ignore */
+          }
         };
-        this.ws.onclose = () => { this.ws = null; this.fallbackToSim(); };
-        this.ws.onerror = () => { this.ws?.close(); };
+        this.ws.onclose = () => {
+          this.ws = null;
+          this.fallbackToSim();
+        };
+        this.ws.onerror = () => {
+          this.ws?.close();
+        };
         return;
-      } catch { /* fall through */ }
+      } catch {
+        /* fall through */
+      }
     }
     this.fallbackToSim();
   }
@@ -108,8 +128,14 @@ class TelemetryService {
   }
 
   private stop() {
-    if (this.timer) { clearInterval(this.timer); this.timer = null; }
-    if (this.ws) { this.ws.close(); this.ws = null; }
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
   }
 }
 

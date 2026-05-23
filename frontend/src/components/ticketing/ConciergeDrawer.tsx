@@ -25,7 +25,9 @@ export function ConciergeDrawer() {
         userId: userName || "fan",
         message: text,
         currentGate: ticket?.assignedGate,
-        userLocationContext: ticket ? `${ticket.stand} stand · ${ticket.entryCorridor} corridor` : "outside facility",
+        userLocationContext: ticket
+          ? `${ticket.stand} stand · ${ticket.entryCorridor} corridor`
+          : "outside facility",
       });
       push({
         id: `a-${Date.now()}`,
@@ -35,7 +37,11 @@ export function ConciergeDrawer() {
         targetGate: res.targetGate,
       });
     } catch (err) {
-      push({ id: `a-${Date.now()}`, role: "assistant", content: `Concierge unreachable: ${(err as Error).message}` });
+      push({
+        id: `a-${Date.now()}`,
+        role: "assistant",
+        content: `Concierge unreachable: ${(err as Error).message}`,
+      });
     } finally {
       setBusy(false);
     }
@@ -62,12 +68,20 @@ export function ConciergeDrawer() {
             <p className="font-hud text-[10px] tracking-[0.3em] text-cyan">// AI CONCIERGE</p>
             <p className="font-display font-bold mt-0.5">Stadium Assistant</p>
           </div>
-          <button onClick={() => setOpen(false)} className="font-hud text-xs tracking-[0.25em] text-muted-foreground hover:text-foreground">CLOSE ✕</button>
+          <button
+            onClick={() => setOpen(false)}
+            className="font-hud text-xs tracking-[0.25em] text-muted-foreground hover:text-foreground"
+          >
+            CLOSE ✕
+          </button>
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {chat.map((m) => (
-            <div key={m.id} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
+            <div
+              key={m.id}
+              className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}
+            >
               <div
                 className={cn(
                   "max-w-[85%] rounded-md px-3 py-2 text-sm",
@@ -95,22 +109,35 @@ export function ConciergeDrawer() {
           ))}
           {busy && (
             <div className="flex justify-start">
-              <div className="hex-frame rounded-md px-3 py-2 text-sm font-hud tracking-[0.2em] text-cyan">…thinking</div>
+              <div className="hex-frame rounded-md px-3 py-2 text-sm font-hud tracking-[0.2em] text-cyan">
+                …thinking
+              </div>
             </div>
           )}
         </div>
 
         <div className="px-4 pb-2 flex flex-wrap gap-1.5">
-          {["Which gate is least busy?", "How do I reach Gate D?", "Where's the nearest metro?"].map((q) => (
-            <button key={q} onClick={() => send(q)} disabled={busy}
-              className="px-2 py-1 rounded-full hex-frame font-hud text-[10px] tracking-[0.15em] text-muted-foreground hover:text-cyan disabled:opacity-50">
+          {[
+            "Which gate is least busy?",
+            "How do I reach Gate D?",
+            "Where's the nearest metro?",
+          ].map((q) => (
+            <button
+              key={q}
+              onClick={() => send(q)}
+              disabled={busy}
+              className="px-2 py-1 rounded-full hex-frame font-hud text-[10px] tracking-[0.15em] text-muted-foreground hover:text-cyan disabled:opacity-50"
+            >
               {q}
             </button>
           ))}
         </div>
 
         <form
-          onSubmit={(e) => { e.preventDefault(); send(); }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            send();
+          }}
           className="p-3 border-t border-border flex gap-2"
         >
           <input
@@ -120,8 +147,11 @@ export function ConciergeDrawer() {
             placeholder="Ask the concierge…"
             className="flex-1 bg-background/60 border border-border rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-cyan)]"
           />
-          <button type="submit" disabled={busy || !draft.trim()}
-            className="px-4 hex-frame rounded-sm font-hud text-[11px] tracking-[0.25em] text-cyan glow-cyan disabled:opacity-50">
+          <button
+            type="submit"
+            disabled={busy || !draft.trim()}
+            className="px-4 hex-frame rounded-sm font-hud text-[11px] tracking-[0.25em] text-cyan glow-cyan disabled:opacity-50"
+          >
             SEND
           </button>
         </form>
@@ -132,8 +162,11 @@ export function ConciergeDrawer() {
 
 function ActionPill({ action }: { action: "REDIRECT" | "STAY" | "PROCEED" }) {
   const color =
-    action === "REDIRECT" ? "var(--color-warn)" :
-    action === "STAY" ? "var(--color-muted-foreground)" : "var(--color-ok)";
+    action === "REDIRECT"
+      ? "var(--color-warn)"
+      : action === "STAY"
+        ? "var(--color-muted-foreground)"
+        : "var(--color-ok)";
   return (
     <span
       className="px-2 py-0.5 rounded-full font-hud text-[10px] tracking-[0.25em]"
@@ -146,7 +179,14 @@ function ActionPill({ action }: { action: "REDIRECT" | "STAY" | "PROCEED" }) {
 
 function BotIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <rect x="4" y="7" width="16" height="12" rx="2" />
       <circle cx="9" cy="13" r="1.2" fill="currentColor" />
       <circle cx="15" cy="13" r="1.2" fill="currentColor" />

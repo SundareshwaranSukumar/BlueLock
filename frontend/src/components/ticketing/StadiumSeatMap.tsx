@@ -57,7 +57,9 @@ export function StadiumSeatMap({ onBooked }: Props) {
         /* keep local matrix */
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [activeStand, setSeats]);
 
   const byStand = useMemo(() => {
@@ -128,7 +130,11 @@ export function StadiumSeatMap({ onBooked }: Props) {
               key={o}
               onClick={() => setTeam(o)}
               className="px-3 py-1.5 rounded-full font-hud text-[11px] tracking-[0.2em] transition"
-              style={team === o ? { background: "var(--color-cyan)", color: "var(--color-background)" } : undefined}
+              style={
+                team === o
+                  ? { background: "var(--color-cyan)", color: "var(--color-background)" }
+                  : undefined
+              }
             >
               {o}
             </button>
@@ -177,14 +183,21 @@ export function StadiumSeatMap({ onBooked }: Props) {
         {selected ? (
           <>
             <div>
-              <p className="font-hud text-[10px] tracking-[0.3em] text-cyan">SELECTED · {selected.stand.toUpperCase()} STAND</p>
+              <p className="font-hud text-[10px] tracking-[0.3em] text-cyan">
+                SELECTED · {selected.stand.toUpperCase()} STAND
+              </p>
               <p className="font-display text-xl font-bold mt-0.5">
                 Seat {selected.id}
-                <span className="text-muted-foreground text-sm font-normal ml-3">{TIER_LABEL[selected.tier]}</span>
+                <span className="text-muted-foreground text-sm font-normal ml-3">
+                  {TIER_LABEL[selected.tier]}
+                </span>
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <p className="font-hud text-2xl font-bold" style={{ color: TIER_COLOR[selected.tier] }}>
+              <p
+                className="font-hud text-2xl font-bold"
+                style={{ color: TIER_COLOR[selected.tier] }}
+              >
                 ₹{selected.price.toLocaleString()}
               </p>
               <button
@@ -197,7 +210,9 @@ export function StadiumSeatMap({ onBooked }: Props) {
             </div>
           </>
         ) : (
-          <p className="text-muted-foreground text-sm">Tap any seat to select. Premium pitch-side rows are highlighted.</p>
+          <p className="text-muted-foreground text-sm">
+            Tap any seat to select. Premium pitch-side rows are highlighted.
+          </p>
         )}
       </div>
     </div>
@@ -212,7 +227,9 @@ const CX = W / 2;
 const CY = H / 2;
 
 function StadiumOval({
-  byStand, selected, onSelect,
+  byStand,
+  selected,
+  onSelect,
 }: {
   byStand: Record<string, Seat[]>;
   selected: Seat | null;
@@ -220,16 +237,54 @@ function StadiumOval({
 }) {
   return (
     <div className="w-full">
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" className="w-full h-auto block" style={{ maxHeight: "78vh" }}>
-
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="xMidYMid meet"
+        className="w-full h-auto block"
+        style={{ maxHeight: "78vh" }}
+      >
         {/* Outer field */}
-        <ellipse cx={CX} cy={CY} rx={300} ry={230} fill="url(#turf)" stroke="var(--color-cyan)" strokeOpacity={0.25} strokeWidth={1.5} />
-        <ellipse cx={CX} cy={CY} rx={290} ry={220} fill="none" stroke="var(--color-cyan)" strokeOpacity={0.12} strokeWidth={1} strokeDasharray="4 6" />
+        <ellipse
+          cx={CX}
+          cy={CY}
+          rx={300}
+          ry={230}
+          fill="url(#turf)"
+          stroke="var(--color-cyan)"
+          strokeOpacity={0.25}
+          strokeWidth={1.5}
+        />
+        <ellipse
+          cx={CX}
+          cy={CY}
+          rx={290}
+          ry={220}
+          fill="none"
+          stroke="var(--color-cyan)"
+          strokeOpacity={0.12}
+          strokeWidth={1}
+          strokeDasharray="4 6"
+        />
         {/* Pitch */}
-        <rect x={CX - 14} y={CY - 70} width={28} height={140} fill="oklch(0.65 0.05 80 / 0.45)" stroke="var(--color-warn)" strokeOpacity={0.4} />
+        <rect
+          x={CX - 14}
+          y={CY - 70}
+          width={28}
+          height={140}
+          fill="oklch(0.65 0.05 80 / 0.45)"
+          stroke="var(--color-warn)"
+          strokeOpacity={0.4}
+        />
         <circle cx={CX} cy={CY - 50} r={4} fill="var(--color-foreground)" opacity={0.6} />
         <circle cx={CX} cy={CY + 50} r={4} fill="var(--color-foreground)" opacity={0.6} />
-        <circle cx={CX} cy={CY} r={28} fill="none" stroke="var(--color-foreground)" strokeOpacity={0.2} />
+        <circle
+          cx={CX}
+          cy={CY}
+          r={28}
+          fill="none"
+          stroke="var(--color-foreground)"
+          strokeOpacity={0.2}
+        />
 
         <defs>
           <radialGradient id="turf" cx="50%" cy="50%" r="60%">
@@ -239,10 +294,34 @@ function StadiumOval({
         </defs>
 
         {/* Stand arcs + seats */}
-        <StandArc stand="Pavilion"    side="N" seats={byStand["Pavilion"]    ?? []} selected={selected} onSelect={onSelect} />
-        <StandArc stand="Raghavendra" side="S" seats={byStand["Raghavendra"] ?? []} selected={selected} onSelect={onSelect} />
-        <StandArc stand="Metro"       side="E" seats={byStand["Metro"]       ?? []} selected={selected} onSelect={onSelect} />
-        <StandArc stand="Garden"      side="W" seats={byStand["Garden"]      ?? []} selected={selected} onSelect={onSelect} />
+        <StandArc
+          stand="Pavilion"
+          side="N"
+          seats={byStand["Pavilion"] ?? []}
+          selected={selected}
+          onSelect={onSelect}
+        />
+        <StandArc
+          stand="Raghavendra"
+          side="S"
+          seats={byStand["Raghavendra"] ?? []}
+          selected={selected}
+          onSelect={onSelect}
+        />
+        <StandArc
+          stand="Metro"
+          side="E"
+          seats={byStand["Metro"] ?? []}
+          selected={selected}
+          onSelect={onSelect}
+        />
+        <StandArc
+          stand="Garden"
+          side="W"
+          seats={byStand["Garden"] ?? []}
+          selected={selected}
+          onSelect={onSelect}
+        />
 
         {/* Gate markers */}
         {STANDS.map((s) => {
@@ -250,8 +329,22 @@ function StadiumOval({
           const p = sidePoint(sideKey, 0.5, 0);
           return (
             <g key={s.name}>
-              <circle cx={p.x} cy={p.y} r={11} fill="var(--color-background)" stroke="var(--color-cyan)" strokeWidth={1.5} />
-              <text x={p.x} y={p.y + 3.5} textAnchor="middle" fontSize="10" fill="var(--color-cyan)" fontFamily="Orbitron, sans-serif">
+              <circle
+                cx={p.x}
+                cy={p.y}
+                r={11}
+                fill="var(--color-background)"
+                stroke="var(--color-cyan)"
+                strokeWidth={1.5}
+              />
+              <text
+                x={p.x}
+                y={p.y + 3.5}
+                textAnchor="middle"
+                fontSize="10"
+                fill="var(--color-cyan)"
+                fontFamily="Orbitron, sans-serif"
+              >
                 G{s.gateId}
               </text>
             </g>
@@ -265,7 +358,7 @@ function StadiumOval({
 type Side = "N" | "S" | "E" | "W";
 function sideFromName(s: string): Side {
   const u = s.toUpperCase();
-  return (u === "NORTH" ? "N" : u === "SOUTH" ? "S" : u === "EAST" ? "E" : "W");
+  return u === "NORTH" ? "N" : u === "SOUTH" ? "S" : u === "EAST" ? "E" : "W";
 }
 
 /**
@@ -273,7 +366,11 @@ function sideFromName(s: string): Side {
  * Rows are stacked outward; each row contains its seats arranged along the arc.
  */
 function StandArc({
-  stand, side, seats, selected, onSelect,
+  stand,
+  side,
+  seats,
+  selected,
+  onSelect,
 }: {
   stand: string;
   side: Side;
@@ -317,9 +414,7 @@ function StandArc({
           const x = CX + Math.cos(angle) * rx;
           const y = CY + Math.sin(angle) * ry;
           const isSel = selected?.id === seat.id;
-          const fill = seat.occupied
-            ? "oklch(0.55 0.22 27 / 0.55)"
-            : TIER_COLOR[seat.tier];
+          const fill = seat.occupied ? "oklch(0.55 0.22 27 / 0.55)" : TIER_COLOR[seat.tier];
           return (
             <g
               key={seat.id}
@@ -339,7 +434,8 @@ function StandArc({
                 strokeWidth={isSel ? 2 : 0}
               />
               <title>
-                {seat.id} · {seat.stand} · {seat.tier} · {seat.occupied ? "Booked" : `₹${seat.price}`}
+                {seat.id} · {seat.stand} · {seat.tier} ·{" "}
+                {seat.occupied ? "Booked" : `₹${seat.price}`}
               </title>
             </g>
           );

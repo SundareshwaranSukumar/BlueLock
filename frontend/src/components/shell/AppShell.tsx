@@ -27,7 +27,9 @@ export function AppShell() {
         {view === 2 && (
           <div className="max-w-3xl mx-auto px-4 space-y-4">
             <header className="text-center">
-              <p className="font-hud text-[11px] tracking-[0.4em] text-cyan">// BOOKING · COMMUTE</p>
+              <p className="font-hud text-[11px] tracking-[0.4em] text-cyan">
+                // BOOKING · COMMUTE
+              </p>
               <h2 className="font-display text-2xl font-bold mt-1">LSG vs PBKS · {VENUE_LABEL}</h2>
             </header>
             <BookingCommuteForm />
@@ -38,7 +40,13 @@ export function AppShell() {
             <Jumbotron />
             <div className="grid lg:grid-cols-2 gap-4">
               <IsoStadium />
-              {ticket ? <BookingConfirmation onBookAnother={() => useStadiumStore.getState().clearTicket()} /> : <StadiumSeatMap onBooked={() => {}} />}
+              {ticket ? (
+                <BookingConfirmation
+                  onBookAnother={() => useStadiumStore.getState().clearTicket()}
+                />
+              ) : (
+                <StadiumSeatMap onBooked={() => {}} />
+              )}
             </div>
           </div>
         )}
