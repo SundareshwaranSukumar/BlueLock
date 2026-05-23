@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 
 GateLetter = Literal["A", "B", "C", "D"]
 Gender = Literal["Male", "Female"]
-Team = Literal["CSK", "MI"]
+Team = Literal["LSG", "PBKS", "CSK", "MI"]
 Corridor = Literal["North", "South", "East", "West"]
 FlowStatus = Literal["ok", "warn", "crit"]
 SuggestedAction = Literal["REDIRECT", "STAY", "PROCEED"]

@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useStadiumStore } from "@/state/useStadiumStore";
-import { STANDS } from "@/domain/fixtures";
+import { EKANA_STANDS, MATCH_AWAY, MATCH_HOME, STANDS } from "@/domain/fixtures";
 import { apiClient } from "@/services/api";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -23,13 +23,42 @@ interface Props {
 
 export function StadiumSeatMap({ onBooked }: Props) {
   const seats = useStadiumStore((s) => s.seats);
+  const setSeats = useStadiumStore((s) => s.setSeats);
   const setTicket = useStadiumStore((s) => s.setTicket);
   const userName = useStadiumStore((s) => s.userName);
   const setUserName = useStadiumStore((s) => s.setUserName);
   const team = useStadiumStore((s) => s.selectedTeam);
   const setTeam = useStadiumStore((s) => s.setTeam);
+  const startingLocation = useStadiumStore((s) => s.startingLocation);
+  const transportMode = useStadiumStore((s) => s.transportMode);
   const [selected, setSelected] = useState<Seat | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [activeStand, setActiveStand] = useState<string>(EKANA_STANDS[0]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await apiClient.getSeatStatus(activeStand);
+        if (cancelled) return;
+        setSeats((prev) =>
+          prev.map((s) => {
+            if (s.stand !== activeStand) return s;
+            const row = res.seats.find((x) => x.seatId === s.id);
+            if (!row) return s;
+            return {
+              ...s,
+              occupied: row.status === "Booked" || row.status === "Locked",
+              apiStatus: row.status as Seat["apiStatus"],
+            };
+          }),
+        );
+      } catch {
+        /* keep local matrix */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [activeStand, setSeats]);
 
   const byStand = useMemo(() => {
     const m: Record<string, Seat[]> = {};
@@ -45,11 +74,14 @@ export function StadiumSeatMap({ onBooked }: Props) {
     }
     setSubmitting(true);
     try {
+      await apiClient.lockSeat(selected.id);
       const res = await apiClient.bookTicket({
         userName: userName.trim(),
         gender: "Male",
         teamAllegiance: team,
         seatId: selected.id,
+        startingLocation,
+        transportMode,
       });
       const standMeta = STANDS.find((s) => s.name === selected.stand)!;
       setTicket({
@@ -64,6 +96,8 @@ export function StadiumSeatMap({ onBooked }: Props) {
         recommendedRoute: res.recommendedRoute,
         nearestTransit: standMeta.transit,
         nearestParking: standMeta.parking,
+        qrCodeSvgBase64: res.qrCodeSvgBase64,
+        googleWalletLink: res.googleWalletLink,
       });
       toast.success(`Seat ${selected.id} confirmed`);
       onBooked();
@@ -89,12 +123,12 @@ export function StadiumSeatMap({ onBooked }: Props) {
           />
         </label>
         <div className="hex-frame rounded-full inline-flex p-0.5">
-          {(["CSK", "MI"] as const).map((o) => (
+          {([MATCH_HOME, MATCH_AWAY] as const).map((o) => (
             <button
               key={o}
               onClick={() => setTeam(o)}
               className="px-3 py-1.5 rounded-full font-hud text-[11px] tracking-[0.2em] transition"
-              style={team === o ? { background: o === "CSK" ? "var(--color-csk)" : "var(--color-mi)", color: "var(--color-background)" } : undefined}
+              style={team === o ? { background: "var(--color-cyan)", color: "var(--color-background)" } : undefined}
             >
               {o}
             </button>
@@ -102,7 +136,20 @@ export function StadiumSeatMap({ onBooked }: Props) {
         </div>
       </div>
 
-      {/* Stadium */}
+      <div className="flex flex-wrap gap-2">
+        {EKANA_STANDS.map((name) => (
+          <button
+            key={name}
+            type="button"
+            onClick={() => setActiveStand(name)}
+            className="hex-frame px-3 py-1 font-hud text-[10px] tracking-[0.2em]"
+            style={activeStand === name ? { borderColor: "var(--color-cyan)" } : undefined}
+          >
+            {name.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
       <div className="hex-frame rounded-md p-3 sm:p-5">
         <StadiumOval byStand={byStand} selected={selected} onSelect={setSelected} />
       </div>

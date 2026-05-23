@@ -25,6 +25,11 @@ export default defineConfig({
           target: backendTarget,
           changeOrigin: true,
         },
+        "/api/v1/stadium/live-stream": {
+          target: backendTarget,
+          changeOrigin: true,
+          ws: true,
+        },
       },
     },
   },

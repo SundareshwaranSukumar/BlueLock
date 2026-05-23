@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from config.database import build_context_snapshot
+from config.gate_state import build_context_snapshot
 from models.schemas import ChatMessage, ChatResponse
 from services.gemini_service import MODEL_ID, generate_stadium_guidance
 

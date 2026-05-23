@@ -1,15 +1,9 @@
 /**
- * Telemetry service — single source of truth for the live-stream contract.
- *
- * Contract: `/v1/stadium/live-stream` → TelemetryPacket per tick.
- * - If VITE_TELEMETRY_WS_URL is set, opens a real WebSocket.
- * - Otherwise runs an in-process simulator emitting the exact same schema,
- *   so the UI is fully decoupled from transport.
- *
- * Consumers attach a single onPacket handler; they never own simulation state.
+ * Telemetry service — WebSocket to /api/v1/stadium/live-stream when backend enabled.
  */
 import type { GateId, GateStatus, TelemetryPacket } from "@/domain/types";
 import { AGENT_REACTIONS } from "@/domain/fixtures";
+import { telemetryWsUrl } from "@/services/api";
 
 export type Unsubscribe = () => void;
 export type TelemetryHandler = (p: TelemetryPacket) => void;
@@ -28,66 +22,39 @@ interface SimState {
 }
 
 function makeInitialSim(): SimState {
-  return {
-    liveScore: 142,
-    wickets: 3,
-    overs: 14.2,
-    occ: { A: 42, B: 61, C: 28, D: 73 },
-  };
+  return { liveScore: 0, wickets: 0, overs: 0, occ: { A: 42, B: 58, C: 28, D: 71 } };
 }
 
 function nextPacket(s: SimState): { state: SimState; packet: TelemetryPacket } {
-  // ball advance
   const ballsThisOver = Math.round((s.overs - Math.floor(s.overs)) * 10);
   const o = Math.floor(s.overs);
   let no = o, nb = ballsThisOver + 1;
   if (nb >= 6) { nb = 0; no = o + 1; }
   const overs = parseFloat(`${no}.${nb}`);
-
-  // event
-  const r = Math.random();
-  const isBoundary = r < 0.18;
-  const isWicket = !isBoundary && r > 0.96;
-  const runDelta = isBoundary ? (Math.random() < 0.35 ? 6 : 4) : Math.random() < 0.5 ? 1 : 0;
-  const liveScore = s.liveScore + runDelta;
-  const wickets = Math.min(10, s.wickets + (isWicket ? 1 : 0));
-
-  // gate drift
+  const liveScore = s.liveScore;
+  const wickets = s.wickets;
   const occ: Record<GateId, number> = { ...s.occ };
   (Object.keys(occ) as GateId[]).forEach((id) => {
     const drift = (Math.random() - 0.45) * 6;
     occ[id] = Math.max(10, Math.min(98, occ[id] + drift));
   });
-
-  // win prob — coarse model
-  const ballsLeft = Math.max(1, (20 - no) * 6 - nb);
-  const wp = Math.min(95, Math.max(5, Math.round(50 + (liveScore - 150) * 0.4 + (5 - wickets) * 3 - ballsLeft * 0.15)));
-
-  const reaction = isWicket
-    ? `WICKET! ${wickets}/10 down. Crowd surging at Gate ${pickHotGate(occ)}.`
-    : isBoundary
-      ? (runDelta === 6 ? "MAXIMUM! Core batter clears the roof! BlueLock grid stabilizing." : "FOUR! Crisp through the covers.")
-      : AGENT_REACTIONS[Math.floor(Math.random() * AGENT_REACTIONS.length)];
-
+  const wp = "—";
   const packet: TelemetryPacket = {
     liveScore,
     wickets,
     overs,
-    winProbability: `${wp}%`,
-    agentReactionText: reaction,
-    isWicket,
-    isBoundary,
+    winProbability: wp,
+    agentReactionText: AGENT_REACTIONS[Math.floor(Math.random() * AGENT_REACTIONS.length)],
+    isWicket: false,
+    isBoundary: false,
+    matchLive: false,
+    matchSource: "simulator",
     gates: (Object.keys(occ) as GateId[]).map((id) => {
-      const o = Math.round(occ[id]);
-      return { gateId: id, occupancy: o, flowRate: Math.round(40 + o * 1.6), status: statusFor(o) };
+      const o2 = Math.round(occ[id]);
+      return { gateId: id, occupancy: o2, flowRate: Math.round(40 + o2 * 1.6), status: statusFor(o2) };
     }),
   };
-
   return { state: { liveScore, wickets, overs, occ }, packet };
-}
-
-function pickHotGate(occ: Record<GateId, number>): GateId {
-  return (Object.entries(occ) as [GateId, number][]).sort((a, b) => b[1] - a[1])[0][0];
 }
 
 class TelemetryService {
@@ -105,7 +72,6 @@ class TelemetryService {
     };
   }
 
-  /** Allow command-side adjustments (director bypass) to influence the next packet. */
   applyBypass(from: GateId, to: GateId) {
     this.sim.occ[from] = Math.max(35, this.sim.occ[from] - 30);
     this.sim.occ[to] = Math.min(95, this.sim.occ[to] + 15);
@@ -113,7 +79,7 @@ class TelemetryService {
 
   private ensureStarted() {
     if (this.timer || this.ws) return;
-    const url = typeof import.meta !== "undefined" ? (import.meta as ImportMeta & { env: Record<string, string | undefined> }).env?.VITE_TELEMETRY_WS_URL : undefined;
+    const url = telemetryWsUrl();
     if (url) {
       try {
         this.ws = new WebSocket(url);
@@ -134,7 +100,7 @@ class TelemetryService {
       const { state, packet } = nextPacket(this.sim);
       this.sim = state;
       this.emit(packet);
-    }, 2200);
+    }, 3000);
   }
 
   private emit(p: TelemetryPacket) {

@@ -16,7 +16,7 @@ export function StatsHub() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-display text-3xl font-bold">Tournament Intelligence</h2>
-          <p className="text-muted-foreground text-sm">Macro view · IPL 2026 · Live data feed</p>
+          <p className="text-muted-foreground text-sm">Macro view · LSG vs PBKS anchor · Live when API keys set</p>
         </div>
         <div className="hex-frame rounded-full p-0.5 flex font-hud text-[10px] tracking-[0.25em]">
           {TABS.map((t) => (

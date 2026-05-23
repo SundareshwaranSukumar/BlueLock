@@ -32,5 +32,5 @@ disallow_untyped_defs = true
 exclude = ["\\.venv"]
 
 [[tool.mypy.overrides]]
-module = ["google.*", "google.genai.*"]
+module = ["google.*", "google.genai.*", "requests.*", "qrcode.*"]
 ignore_missing_imports = true

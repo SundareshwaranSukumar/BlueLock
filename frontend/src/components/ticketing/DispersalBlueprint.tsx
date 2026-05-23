@@ -25,7 +25,7 @@ export function DispersalBlueprint() {
             <div>
               <p className="font-hud text-[10px] tracking-[0.3em] text-cyan">// DISPERSAL BLUEPRINT</p>
               <h3 className="font-display text-2xl font-bold mt-1">Seat {ticket.seatId}</h3>
-              <p className="text-muted-foreground text-sm">{ticket.stand} Stand · CSK vs MI · Tonight 19:30</p>
+              <p className="text-muted-foreground text-sm">{ticket.stand} · LSG vs PBKS · Ekana 19:30</p>
             </div>
             <HexIcon size={48} className="text-cyan" />
           </div>

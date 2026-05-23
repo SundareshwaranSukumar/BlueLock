@@ -48,10 +48,10 @@ export function IsoStadium() {
         <circle cx="400" cy="260" r="6" fill="oklch(0.98 0.005 240)" opacity="0.6" />
 
         {/* Stand labels */}
-        <text x="400" y="55"  textAnchor="middle" className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>RAGHAVENDRA</text>
-        <text x="770" y="265" textAnchor="end"    className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>PAVILION</text>
-        <text x="400" y="475" textAnchor="middle" className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>METRO</text>
-        <text x="30"  y="265"                       className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>GARDEN</text>
+        <text x="400" y="55"  textAnchor="middle" className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>NORTH BLOCK</text>
+        <text x="770" y="265" textAnchor="end"    className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>EAST LOUNGE</text>
+        <text x="400" y="475" textAnchor="middle" className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>SOUTH BLOCK</text>
+        <text x="30"  y="265"                       className="fill-foreground" style={{ fontFamily: "Orbitron", fontSize: 11, letterSpacing: 3 }}>WEST TERRACE</text>
 
         {/* Gate halos */}
         <GateHalo gate={gateMap.A} cx={400} cy={60}  />

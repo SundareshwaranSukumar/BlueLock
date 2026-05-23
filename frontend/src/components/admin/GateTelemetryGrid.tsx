@@ -54,7 +54,7 @@ export function GateTelemetryGrid() {
 }
 
 function GateCard({ gate, pending, onBypass }: { gate: Gate; pending: boolean; onBypass: () => void }) {
-  const critical = gate.status === "CRITICAL";
+  const critical = gate.status === "CRITICAL" || gate.load >= 80;
   const warn = gate.status === "WARNING";
   const color = critical ? "var(--color-crit)" : warn ? "var(--color-warn)" : "var(--color-ok)";
   const label = gate.status;

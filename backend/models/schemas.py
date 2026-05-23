@@ -64,3 +64,45 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     version: str
+
+
+class SeatStatusItem(BaseModel):
+    seatId: str
+    status: str
+    updatedAt: str
+
+
+class SeatStatusListResponse(BaseModel):
+    standName: str
+    seats: list[SeatStatusItem]
+
+
+class LockSeatRequest(BaseModel):
+    seatId: str = Field(..., min_length=2, max_length=32)
+
+
+class LockSeatResponse(BaseModel):
+    seatId: str
+    status: str
+
+
+class BookTicketFull(BaseModel):
+    userName: str = Field(..., min_length=1, max_length=120)
+    gender: str = Field(..., min_length=1, max_length=16)
+    teamAllegiance: str = Field(..., min_length=2, max_length=16)
+    seatId: str = Field(..., min_length=2, max_length=32)
+    startingLocation: str = Field(default="Lucknow Junction", max_length=200)
+    transportMode: str = Field(default="metro", max_length=32)
+
+
+class BookTicketFullResponse(BaseModel):
+    ticketId: str
+    assignedGate: str
+    recommendedRoute: str
+    nearestTransit: str
+    entryCorridor: str
+    metroLoad: str
+    qrCodeSvgBase64: str
+    googleWalletLink: str
+    standName: str
+    seatId: str

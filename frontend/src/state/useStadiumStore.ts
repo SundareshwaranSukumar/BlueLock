@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import type { ChatMessage, Directive, Gate, GateId, MatchState, TelemetryPacket, UserRole, UserTicket } from "@/domain/types";
-import { INITIAL_GATES, buildSeatMatrix } from "@/domain/fixtures";
+import type { ChatMessage, Directive, Gate, GateId, MatchState, ParkingLot, TelemetryPacket, UserRole, UserTicket } from "@/domain/types";
+import { INITIAL_GATES, MATCH_AWAY, MATCH_HOME, PARKING_LOTS, buildSeatMatrix } from "@/domain/fixtures";
 
 export type ViewId = 1 | 2 | 3 | 4 | 5;
 
@@ -11,10 +11,12 @@ interface StadiumState {
   userRole: UserRole;
   setRole: (r: UserRole) => void;
 
-
   gates: Gate[];
+  parkingLots: ParkingLot[];
+  intelLog: string[];
 
   seats: ReturnType<typeof buildSeatMatrix>;
+  setSeats: (seats: ReturnType<typeof buildSeatMatrix>) => void;
   ticket: UserTicket | null;
   setTicket: (t: UserTicket) => void;
   clearTicket: () => void;
@@ -25,20 +27,21 @@ interface StadiumState {
   match: MatchState;
   agentReaction: string;
 
-  selectedTeam: "CSK" | "MI";
+  selectedTeam: "LSG" | "PBKS";
   userName: string;
-  setTeam: (t: "CSK" | "MI") => void;
+  startingLocation: string;
+  transportMode: string;
+  setTeam: (t: "LSG" | "PBKS") => void;
   setUserName: (n: string) => void;
+  setStartingLocation: (s: string) => void;
+  setTransportMode: (m: string) => void;
 
-  // chat
   chat: ChatMessage[];
   chatOpen: boolean;
   pushChat: (m: ChatMessage) => void;
   setChatOpen: (b: boolean) => void;
 
-  // telemetry sink (called by service layer; no UI logic)
   applyTelemetry: (p: TelemetryPacket) => void;
-  /** Director rerouted user out of a congested gate — self-heal local ticket. */
   rerouteTicketIfAffected: (fromGate: GateId, toGate: GateId) => void;
 }
 
@@ -53,9 +56,12 @@ export const useStadiumStore = create<StadiumState>((set, get) => ({
   userRole: "none",
   setRole: (r) => set({ userRole: r }),
 
-  gates: INITIAL_GATES.map(g => ({ ...g })),
+  gates: INITIAL_GATES.map((g) => ({ ...g })),
+  parkingLots: PARKING_LOTS.map((p) => ({ ...p })),
+  intelLog: [],
 
   seats: buildSeatMatrix(),
+  setSeats: (seats) => set({ seats }),
   ticket: null,
   setTicket: (t) => set({ ticket: t }),
   clearTicket: () => set({ ticket: null }),
@@ -63,16 +69,29 @@ export const useStadiumStore = create<StadiumState>((set, get) => ({
   directives: [],
   pushDirective: (d) => set((s) => ({ directives: [d, ...s.directives].slice(0, 30) })),
 
-  match: { runs: 142, wickets: 3, overs: "14.2", batting: "CSK", bowling: "MI", winProbability: "62%" },
-  agentReaction: "Powerplay control — CSK riding the cover drive.",
+  match: {
+    runs: 0,
+    wickets: 0,
+    overs: "0.0",
+    batting: MATCH_HOME,
+    bowling: MATCH_AWAY,
+    winProbability: "—",
+    live: false,
+    source: "awaiting",
+  },
+  agentReaction: "Connecting to Ekana live feed…",
 
-  selectedTeam: "CSK",
+  selectedTeam: MATCH_HOME,
   userName: "",
+  startingLocation: "Lucknow Junction",
+  transportMode: "metro",
   setTeam: (t) => set({ selectedTeam: t }),
   setUserName: (n) => set({ userName: n }),
+  setStartingLocation: (s) => set({ startingLocation: s }),
+  setTransportMode: (m) => set({ transportMode: m }),
 
   chat: [
-    { id: "sys", role: "assistant", content: "I'm your BlueLock Concierge. Ask me about gates, routes, or metro pulse." },
+    { id: "sys", role: "assistant", content: "BlueLock Concierge online for Ekana · LSG vs PBKS." },
   ],
   chatOpen: false,
   pushChat: (m) => set((s) => ({ chat: [...s.chat, m] })),
@@ -82,18 +101,32 @@ export const useStadiumStore = create<StadiumState>((set, get) => ({
     set((s) => {
       const oversInt = Math.floor(p.overs);
       const balls = Math.round((p.overs - oversInt) * 10);
+      const parking = p.parking
+        ? Object.entries(p.parking).map(([id, lot], i) => ({
+            id,
+            name: id.replace("P-", "") + " Lot",
+            capacity: lot.capacity,
+            filled: lot.filled,
+            gate: (["A", "B", "C", "D"] as GateId[])[i % 4],
+          }))
+        : s.parkingLots;
       return {
         gates: s.gates.map((g) => {
           const u = p.gates.find((x) => x.gateId === g.id);
           if (!u) return g;
-          return { ...g, load: u.occupancy, flowRate: u.flowRate, status: u.status };
+          return { ...g, load: u.occupancy, flowRate: u.flowRate ?? u.scansPerMin ?? g.flowRate, status: u.status };
         }),
+        parkingLots: parking,
         match: {
           ...s.match,
           runs: p.liveScore,
           wickets: p.wickets,
           overs: `${oversInt}.${balls}`,
           winProbability: p.winProbability,
+          batting: p.batting ?? s.match.batting,
+          bowling: p.bowling ?? s.match.bowling,
+          live: p.matchLive ?? p.liveScore > 0,
+          source: p.matchSource ?? s.match.source,
         },
         agentReaction: p.agentReactionText,
       };

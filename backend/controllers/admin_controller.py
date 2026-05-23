@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from config.database import apply_bypass, get_gate
+from config.gate_state import apply_bypass, get_gate
 from models.schemas import BypassCommand, BypassResponse
 
 

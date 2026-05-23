@@ -5,10 +5,11 @@ from __future__ import annotations
 import json
 import re
 
-from config.database import get_all_gates
+from config.database import SessionLocal
+from config.gate_state import get_all_gates
 from controllers.admin_controller import execute_bypass_route
 from controllers.ai_controller import stadium_assistant
-from controllers.ticket_controller import book_ticket
+from controllers.ticket_controller import book_ticket_full
 from models.frontend_contracts import (
     Corridor,
     FlowStatus,
@@ -21,85 +22,71 @@ from models.frontend_contracts import (
     GateLetter,
     SuggestedAction,
 )
-from models.schemas import BypassCommand, ChatMessage, TicketBooking
+from models.schemas import BypassCommand, ChatMessage
 
-# UI gates (Chinnaswamy concourse labels) ↔ backend operational gate clusters
 UI_GATE_TO_STAND: dict[GateLetter, str] = {
     "A": "north",
-    "B": "east",
-    "C": "west",
-    "D": "south",
+    "B": "south",
+    "C": "east",
+    "D": "west",
 }
 
 UI_GATE_TO_PRIMARY_BACKEND: dict[GateLetter, str] = {
-    "A": "N-A",
-    "B": "E-A",
-    "C": "W-A",
-    "D": "S-A",
+    "A": "GATE-A",
+    "B": "GATE-B",
+    "C": "GATE-C",
+    "D": "GATE-D",
 }
 
 STAND_TO_UI_GATE: dict[str, GateLetter] = {
     "north": "A",
-    "east": "B",
-    "west": "C",
-    "south": "D",
-    "vip": "B",
+    "south": "B",
+    "east": "C",
+    "west": "D",
 }
 
 CORRIDOR: dict[GateLetter, Corridor] = {
     "A": "North",
-    "B": "East",
-    "C": "West",
-    "D": "South",
+    "B": "South",
+    "C": "East",
+    "D": "West",
 }
 
 NEAREST_TRANSIT: dict[GateLetter, str] = {
-    "A": "Namma Metro · Cubbon Park (350m)",
-    "B": "BMTC Hub · MG Road (480m)",
-    "C": "Namma Metro · Vidhana Soudha (620m)",
-    "D": "Namma Metro · Trinity (210m)",
-}
-
-STAND_NAMES: dict[str, str] = {
-    "R": "Raghavendra",
-    "P": "Pavilion",
-    "G": "Garden",
-    "M": "Metro",
+    "A": "Metro Red Line · Ekana North (350m)",
+    "B": "Metro Red Line · Ekana South (420m)",
+    "C": "Bus Hub · Gomti Nagar (480m)",
+    "D": "Ride Pool · West Plaza (290m)",
 }
 
 SEAT_PREFIX_TO_STAND: dict[str, str] = {
-    "R": "north",
-    "P": "east",
-    "G": "west",
-    "M": "south",
-}
-
-BACKEND_PREFIX_TO_UI: dict[str, GateLetter] = {
-    "N": "A",
-    "E": "B",
-    "W": "C",
-    "S": "D",
-    "VIP": "B",
+    "N": "north",
+    "S": "south",
+    "E": "east",
+    "W": "west",
 }
 
 ASSISTANT_JSON_SUFFIX = """
 Always end your reply with a single JSON line (no markdown fences):
 {"suggestedAction":"REDIRECT"|"STAY"|"PROCEED","targetGate":"A"|"B"|"C"|"D"|null}
-Gates: A=North/Raghavendra, B=East/Pavilion, C=West/Garden, D=South/Metro.
+Gates: A=North, B=South, C=East, D=West at Ekana Cricket Stadium.
 """
 
 
 def _seat_stand_vector(seat_id: str) -> str:
-    key = (seat_id[0] if seat_id else "R").upper()
+    key = (seat_id[0] if seat_id else "N").upper()
     return SEAT_PREFIX_TO_STAND.get(key, "north")
 
 
 def _backend_gate_to_ui(gate_id: str, stand_vector: str) -> GateLetter:
-    if gate_id.startswith("VIP"):
+    if "A" in gate_id:
+        return "A"
+    if "B" in gate_id:
         return "B"
-    prefix = gate_id.split("-", maxsplit=1)[0] if "-" in gate_id else gate_id[:1]
-    if prefix in BACKEND_PREFIX_TO_UI:
-        return BACKEND_PREFIX_TO_UI[prefix]
+    if "C" in gate_id:
+        return "C"
+    if "D" in gate_id:
+        return "D"
     return STAND_TO_UI_GATE.get(stand_vector, "A")
 
 
@@ -112,37 +99,34 @@ def _queue_to_metro_load(minutes: int) -> FlowStatus:
 
 
 def book_ticket_frontend(payload: FrontendBookTicket) -> FrontendBookTicketResponse:
-    """Book a ticket using frontend payload shape; return frontend response."""
-    stand = _seat_stand_vector(payload.seatId)
-    booking = book_ticket(
-        TicketBooking(
-            attendee_name=payload.userName,
-            match_id=f"APL-{payload.teamAllegiance}",
-            stand_vector=stand,
-            seat_section=payload.seatId,
-            ticket_count=1,
+    db = SessionLocal()
+    try:
+        from models.schemas import BookTicketFull
+
+        full = book_ticket_full(
+            db,
+            BookTicketFull(
+                userName=payload.userName,
+                gender=payload.gender,
+                teamAllegiance=payload.teamAllegiance,
+                seatId=payload.seatId,
+                startingLocation="Ekana approach",
+                transportMode="metro",
+            ),
         )
-    )
-
-    ui_gate = _backend_gate_to_ui(booking.assigned_gate, booking.stand_vector)
-    corridor = CORRIDOR[ui_gate]
-    stand_key = (payload.seatId[0] or "R").upper()
-    stand_label = STAND_NAMES.get(stand_key, "General")
-
-    return FrontendBookTicketResponse(
-        ticketId=booking.booking_id,
-        assignedGate=ui_gate,
-        recommendedRoute=(
-            f"Enter via {corridor} concourse → Gate {ui_gate} → {stand_label} Stand."
-        ),
-        nearestTransit=NEAREST_TRANSIT[ui_gate],
-        entryCorridor=corridor,
-        metroLoad=_queue_to_metro_load(booking.estimated_queue_minutes),
-    )
+        return FrontendBookTicketResponse(
+            ticketId=full.ticketId,
+            assignedGate=full.assignedGate,  # type: ignore[arg-type]
+            recommendedRoute=full.recommendedRoute,
+            nearestTransit=full.nearestTransit,
+            entryCorridor=full.entryCorridor,  # type: ignore[arg-type]
+            metroLoad=full.metroLoad,  # type: ignore[arg-type]
+        )
+    finally:
+        db.close()
 
 
 def bypass_route_frontend(payload: FrontendBypass) -> FrontendBypassResponse:
-    """Execute director bypass from frontend payload shape."""
     target_backend = UI_GATE_TO_PRIMARY_BACKEND[payload.targetDiversionGateId]
     command = BypassCommand(
         director_id="DIRECTOR-PANEL",
@@ -156,7 +140,6 @@ def bypass_route_frontend(payload: FrontendBypass) -> FrontendBypassResponse:
     gates = get_all_gates()
     total_load = sum(g.current_load for g in gates.values())
     notified = (800 + (total_load // 2)) if result.success else 0
-
     return FrontendBypassResponse(
         status="DISPATCHED",
         clientsNotifiedCount=notified,
@@ -188,7 +171,6 @@ def _extract_assistant_meta(
 def stadium_assistant_frontend(
     payload: FrontendAssistant,
 ) -> FrontendAssistantResponse:
-    """Run stadium assistant using frontend payload shape."""
     context_bits = [
         f"userId={payload.userId}",
         f"currentGate={payload.currentGate or 'unknown'}",

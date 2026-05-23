@@ -3,6 +3,7 @@ export type GateStatus = "NORMAL" | "WARNING" | "CRITICAL";
 export type FlowStatus = "ok" | "warn" | "crit";
 export type SeatTier = "PREMIUM" | "GOLD" | "SILVER";
 export type UserRole = "none" | "fan" | "admin";
+export type TeamCode = "LSG" | "PBKS" | "CSK" | "MI" | "RCB" | "KKR";
 
 export interface Gate {
   id: GateId;
@@ -23,6 +24,7 @@ export interface Seat {
   occupied: boolean;
   tier: SeatTier;
   price: number;
+  apiStatus?: "Available" | "Locked" | "Booked";
 }
 
 export interface UserTicket {
@@ -37,6 +39,8 @@ export interface UserTicket {
   recommendedRoute: string;
   nearestTransit: string;
   nearestParking: string;
+  qrCodeSvgBase64?: string;
+  googleWalletLink?: string;
 }
 
 export interface Directive {
@@ -50,7 +54,7 @@ export interface Directive {
 export interface Player {
   id: string;
   name: string;
-  team: "CSK" | "MI" | "RCB" | "KKR";
+  team: TeamCode;
   role: "BAT" | "BOWL" | "AR" | "WK";
   attrs: { strike: number; control: number; power: number; consistency: number; fielding: number };
   phases: { powerplay: number; middle: number; death: number };
@@ -58,7 +62,7 @@ export interface Player {
 
 export interface TeamRow {
   team: string;
-  short: "CSK" | "MI" | "RCB" | "KKR";
+  short: TeamCode;
   played: number;
   won: number;
   lost: number;
@@ -70,9 +74,11 @@ export interface MatchState {
   runs: number;
   wickets: number;
   overs: string;
-  batting: "CSK" | "MI";
-  bowling: "CSK" | "MI";
+  batting: TeamCode;
+  bowling: TeamCode;
   winProbability: string;
+  live: boolean;
+  source: string;
 }
 
 export interface TelemetryPacket {
@@ -83,7 +89,13 @@ export interface TelemetryPacket {
   agentReactionText: string;
   isWicket: boolean;
   isBoundary: boolean;
-  gates: { gateId: GateId; occupancy: number; flowRate: number; status: GateStatus }[];
+  batting?: TeamCode;
+  bowling?: TeamCode;
+  matchLive?: boolean;
+  matchSource?: string;
+  gates: { gateId: GateId; occupancy: number; flowRate: number; status: GateStatus; scansPerMin?: number }[];
+  parking?: Record<string, { capacity: number; filled: number; free: number; pct: number }>;
+  transit_feed?: { mode: string; line: string; status: string; eta: string }[];
 }
 
 export interface ChatMessage {

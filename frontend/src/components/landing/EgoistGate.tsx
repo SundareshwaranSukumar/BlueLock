@@ -44,9 +44,9 @@ export function EgoistGate() {
       </div>
 
       <div className="absolute bottom-6 left-6 right-6 flex justify-between font-hud text-[10px] tracking-[0.3em] text-muted-foreground">
-        <span>LAT 12.9784° N</span>
-        <span className="hidden sm:inline">M. CHINNASWAMY / NODE-07</span>
-        <span>LON 77.5996° E</span>
+        <span>LAT 26.8150° N</span>
+        <span className="hidden sm:inline">EKANA CRICKET STADIUM / NODE-07</span>
+        <span>LON 81.0050° E</span>
       </div>
     </section>
   );
