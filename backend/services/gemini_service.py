@@ -11,16 +11,27 @@ from google.genai import types
 
 load_dotenv()
 
-BLUELOCK_SYSTEM_INSTRUCTION = """You are the BlueLock Operational Persona — the authoritative
-multimodal stadium command assistant for crowd dispersal, gate routing, and emergency egress.
+BLUELOCK_SYSTEM_INSTRUCTION = (
+    "You are the BlueLock Operational Persona — the authoritative "
+    "multimodal stadium command assistant for crowd dispersal, gate routing, "
+    "and emergency egress.\n\n"
+    "Rules:\n"
+    "- Prioritize spectator safety, clear directional guidance, and "
+    "decongestion at all times.\n"
+    "- Use injected gate status context when present; never invent live "
+    "telemetry.\n"
+    "- Recommend specific gates or exits only when supported by the provided "
+    "context.\n"
+    "- For emergencies, direct users to nearest safe egress and advise "
+    "following venue staff.\n"
+    "- Keep responses concise, actionable, and suitable for display on mobile "
+    "stadium apps."
+)
 
-Rules:
-- Prioritize spectator safety, clear directional guidance, and decongestion at all times.
-- Use injected gate status context when present; never invent live telemetry.
-- Recommend specific gates or exits only when supported by the provided context.
-- For emergencies, direct users to nearest safe egress and advise following venue staff.
-- Keep responses concise, actionable, and suitable for display on mobile stadium apps.
-"""
+FALLBACK_REPLY = (
+    "BlueLock is temporarily unable to process your request. "
+    "Please contact venue staff."
+)
 
 MODEL_ID = "gemini-1.5-flash"
 GENERATION_CONFIG = types.GenerateContentConfig(
@@ -35,7 +46,8 @@ def _get_client() -> genai.Client:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key or api_key == "your_google_genai_api_key_here":
         raise ValueError(
-            "GEMINI_API_KEY is missing or unset. Copy .env.template to .env and configure it."
+            "GEMINI_API_KEY is missing or unset. "
+            "Copy .env.template to .env and configure it."
         )
     return genai.Client(api_key=api_key)
 
@@ -63,5 +75,5 @@ def generate_stadium_guidance(user_message: str, context: str | None = None) -> 
 
     text = response.text
     if not text:
-        return "BlueLock is temporarily unable to process your request. Please contact venue staff."
-    return text.strip()
+        return FALLBACK_REPLY
+    return str(text).strip()

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { corsOptions, proxyPostToBackend, shouldProxyToBackend } from "@/lib/backend-proxy";
 import { z } from "zod";
 
 const Schema = z.object({
@@ -16,8 +17,11 @@ const cors = {
 export const Route = createFileRoute("/api/v1/admin/bypass-route")({
   server: {
     handlers: {
-      OPTIONS: async () => new Response(null, { status: 204, headers: cors }),
+      OPTIONS: async () => corsOptions(),
       POST: async ({ request }) => {
+        if (shouldProxyToBackend()) {
+          return proxyPostToBackend(request, "/api/v1/admin/bypass-route");
+        }
         try {
           const parsed = Schema.safeParse(await request.json());
           if (!parsed.success) {
@@ -25,7 +29,6 @@ export const Route = createFileRoute("/api/v1/admin/bypass-route")({
               status: 400, headers: { "Content-Type": "application/json", ...cors },
             });
           }
-          // Mock dispatch — production would push to staff radios + push notifications.
           const clientsNotifiedCount = 800 + Math.floor(Math.random() * 1200);
           return new Response(JSON.stringify({ status: "DISPATCHED", clientsNotifiedCount }), {
             status: 200, headers: { "Content-Type": "application/json", ...cors },

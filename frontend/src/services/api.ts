@@ -3,6 +3,7 @@
  * UI components depend on these typed wrappers, not on fetch.
  */
 import type { GateId } from "@/domain/types";
+import { apiUrl } from "@/lib/api-base";
 
 export interface BookTicketReq {
   userName: string;
@@ -42,7 +43,7 @@ export interface AssistantRes {
 }
 
 async function postJSON<TIn, TOut>(path: string, body: TIn): Promise<TOut> {
-  const res = await fetch(path, {
+  const res = await fetch(apiUrl(path), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

@@ -1,0 +1,82 @@
+@startuml BlueLock_Architecture
+!theme plain
+title BlueLock — Smart Stadium Command Grid
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor "Fan / Director" as User
+
+package "Client Tier" {
+  [TanStack Start UI\nReact 19 + Zustand] as UI
+  [api.ts Client] as API
+}
+
+package "Firebase Hosting (static client)" #LightYellow {
+  [Static Assets\nfrontend/dist/client] as Static
+  [Rewrites /api/** → Cloud Run] as Rewrites
+}
+
+package "Google Cloud Run" #LightBlue {
+  package "FastAPI Backend" {
+    [main.py] as Main
+    [v1_routes] as Routes
+    [Controllers] as Ctrl
+    [frontend_adapter] as Adapter
+    [database.py\nIn-Memory Gates] as State
+    [gemini_service] as GeminiSvc
+  }
+}
+
+cloud "Google GenAI" as GenAI {
+  [gemini-1.5-flash] as Model
+}
+
+User --> UI
+UI --> API
+API --> Static : production
+Static --> Rewrites : /api/v1/*
+Rewrites --> Routes : HTTPS
+API --> Routes : dev proxy\n127.0.0.1:8000
+
+Main --> Routes
+Routes --> Ctrl
+Routes --> Adapter
+Adapter --> Ctrl
+Ctrl --> State
+Ctrl --> GeminiSvc
+GeminiSvc --> Model
+
+note right of Adapter
+  Maps UI gates A–D
+  to backend N-A, E-A, …
+end note
+
+note bottom of State
+  Thread-safe gate load,
+  bypass flags, audit log
+end note
+
+@enduml
+
+@startuml BlueLock_Request_Flow
+!theme plain
+title Ticket Booking — Integrated Path
+
+actor Fan
+participant "StadiumSeatMap" as UI
+participant "apiClient" as Client
+participant "Vite Proxy" as Proxy
+participant "ticket_controller" as TC
+participant "database" as DB
+
+Fan -> UI : confirm seat
+UI -> Client : bookTicket()
+Client -> Proxy : POST /api/v1/tickets/book
+Proxy -> TC : forward JSON
+TC -> DB : increment gate load
+DB --> TC : updated gate
+TC --> Client : ticketId, gate, route
+Client --> UI : render ticket
+
+@enduml

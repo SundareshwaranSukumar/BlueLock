@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +14,15 @@ from routes.main_router import api_router
 load_dotenv()
 
 APP_VERSION = "1.0.0"
+SERVICE_NAME = "bluelock-backend"
+
+
+def _cors_origins() -> list[str]:
+    raw = os.getenv("CORS_ORIGINS", "*")
+    if raw.strip() == "*":
+        return ["*"]
+    return [origin.strip() for origin in raw.split(",") if origin.strip()]
+
 
 app = FastAPI(
     title="BlueLock Command Grid API",
@@ -23,7 +34,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -36,6 +47,6 @@ app.include_router(api_router)
 async def health_check() -> HealthResponse:
     return HealthResponse(
         status="healthy",
-        service="bluelock-backend",
+        service=SERVICE_NAME,
         version=APP_VERSION,
     )

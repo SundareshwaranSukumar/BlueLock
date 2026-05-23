@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { corsOptions, proxyPostToBackend, shouldProxyToBackend } from "@/lib/backend-proxy";
 import { z } from "zod";
 
 const Schema = z.object({
@@ -30,8 +31,11 @@ const cors = {
 export const Route = createFileRoute("/api/v1/tickets/book")({
   server: {
     handlers: {
-      OPTIONS: async () => new Response(null, { status: 204, headers: cors }),
+      OPTIONS: async () => corsOptions(),
       POST: async ({ request }) => {
+        if (shouldProxyToBackend()) {
+          return proxyPostToBackend(request, "/api/v1/tickets/book");
+        }
         try {
           const body = await request.json();
           const parsed = Schema.safeParse(body);
@@ -56,7 +60,7 @@ export const Route = createFileRoute("/api/v1/tickets/book")({
           return new Response(JSON.stringify(res), {
             status: 200, headers: { "Content-Type": "application/json", ...cors },
           });
-        } catch (err) {
+        } catch {
           return new Response(JSON.stringify({ error: "Booking failed" }), {
             status: 500, headers: { "Content-Type": "application/json", ...cors },
           });

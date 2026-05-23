@@ -2,11 +2,22 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+import logging
+from typing import Any
+
+from fastapi import APIRouter, HTTPException, Request
 
 from controllers.admin_controller import execute_bypass_route
 from controllers.ai_controller import stadium_assistant
 from controllers.ticket_controller import book_ticket
+from models.frontend_contracts import (
+    FrontendAssistant,
+    FrontendAssistantResponse,
+    FrontendBookTicket,
+    FrontendBookTicketResponse,
+    FrontendBypass,
+    FrontendBypassResponse,
+)
 from models.schemas import (
     BypassCommand,
     BypassResponse,
@@ -15,33 +26,71 @@ from models.schemas import (
     TicketBooking,
     TicketBookingResponse,
 )
+from routes.request_utils import read_json_object, validate_model
+from services.frontend_adapter import (
+    book_ticket_frontend,
+    bypass_route_frontend,
+    stadium_assistant_frontend,
+)
+
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/api/v1", tags=["v1"])
 
 
-@router.post("/tickets/book", response_model=TicketBookingResponse)
-async def post_book_ticket(payload: TicketBooking) -> TicketBookingResponse:
-    return book_ticket(payload)
+def _is_frontend_ticket(body: dict[str, Any]) -> bool:
+    return "seatId" in body and "userName" in body
 
 
-@router.post("/ai/stadium-assistant", response_model=ChatResponse)
-async def post_stadium_assistant(payload: ChatMessage) -> ChatResponse:
+def _is_frontend_bypass(body: dict[str, Any]) -> bool:
+    return "congestedGateId" in body and "targetDiversionGateId" in body
+
+
+def _is_frontend_assistant(body: dict[str, Any]) -> bool:
+    return "message" in body and "userId" in body
+
+
+@router.post("/tickets/book")
+async def post_book_ticket(
+    request: Request,
+) -> TicketBookingResponse | FrontendBookTicketResponse:
+    body = await read_json_object(request)
+    if _is_frontend_ticket(body):
+        return book_ticket_frontend(validate_model(FrontendBookTicket, body))
+    return book_ticket(validate_model(TicketBooking, body))
+
+
+@router.post("/ai/stadium-assistant")
+async def post_stadium_assistant(
+    request: Request,
+) -> ChatResponse | FrontendAssistantResponse:
+    body = await read_json_object(request)
     try:
-        return stadium_assistant(payload)
+        if _is_frontend_assistant(body):
+            return stadium_assistant_frontend(validate_model(FrontendAssistant, body))
+        return stadium_assistant(validate_model(ChatMessage, body))
     except ValueError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except HTTPException:
+        raise
     except Exception as exc:
+        logger.exception("Stadium assistant failed")
         raise HTTPException(
             status_code=502,
             detail="Stadium assistant unavailable",
         ) from exc
 
 
-@router.post("/admin/bypass-route", response_model=BypassResponse)
-async def post_bypass_route(payload: BypassCommand) -> BypassResponse:
-    return execute_bypass_route(payload)
+@router.post("/admin/bypass-route")
+async def post_bypass_route(
+    request: Request,
+) -> BypassResponse | FrontendBypassResponse:
+    body = await read_json_object(request)
+    if _is_frontend_bypass(body):
+        return bypass_route_frontend(validate_model(FrontendBypass, body))
+    return execute_bypass_route(validate_model(BypassCommand, body))
 
 
-# WebSocket pipeline placeholder — extend for live gate telemetry push
 @router.get("/health")
 async def v1_health() -> dict[str, str]:
     return {"status": "ok", "pipeline": "rest+websocket-ready"}

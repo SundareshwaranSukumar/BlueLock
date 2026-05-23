@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { corsOptions, proxyPostToBackend, shouldProxyToBackend } from "@/lib/backend-proxy";
 import { z } from "zod";
 
 const Schema = z.object({
@@ -39,8 +40,11 @@ function extractJSONTail(text: string): { reply: string; meta: { suggestedAction
 export const Route = createFileRoute("/api/v1/ai/stadium-assistant")({
   server: {
     handlers: {
-      OPTIONS: async () => new Response(null, { status: 204, headers: cors }),
+      OPTIONS: async () => corsOptions(),
       POST: async ({ request }) => {
+        if (shouldProxyToBackend()) {
+          return proxyPostToBackend(request, "/api/v1/ai/stadium-assistant");
+        }
         try {
           const parsed = Schema.safeParse(await request.json());
           if (!parsed.success) {
@@ -52,7 +56,7 @@ export const Route = createFileRoute("/api/v1/ai/stadium-assistant")({
           const apiKey = process.env.LOVABLE_API_KEY;
           if (!apiKey) {
             return new Response(JSON.stringify({
-              replyText: "Concierge offline — LOVABLE_API_KEY not configured.",
+              replyText: "Concierge offline — set GEMINI via backend (VITE_USE_BACKEND=true) or LOVABLE_API_KEY.",
               suggestedAction: "STAY",
             }), { status: 200, headers: { "Content-Type": "application/json", ...cors } });
           }
@@ -78,11 +82,6 @@ export const Route = createFileRoute("/api/v1/ai/stadium-assistant")({
               status: 200, headers: { "Content-Type": "application/json", ...cors },
             });
           }
-          if (aiRes.status === 402) {
-            return new Response(JSON.stringify({ replyText: "Concierge credits exhausted. Please top up the workspace.", suggestedAction: "STAY" }), {
-              status: 200, headers: { "Content-Type": "application/json", ...cors },
-            });
-          }
           if (!aiRes.ok) {
             return new Response(JSON.stringify({ replyText: "Concierge upstream error.", suggestedAction: "STAY" }), {
               status: 200, headers: { "Content-Type": "application/json", ...cors },
@@ -97,7 +96,7 @@ export const Route = createFileRoute("/api/v1/ai/stadium-assistant")({
             suggestedAction: meta.suggestedAction,
             targetGate: meta.targetGate ?? undefined,
           }), { status: 200, headers: { "Content-Type": "application/json", ...cors } });
-        } catch (err) {
+        } catch {
           return new Response(JSON.stringify({ replyText: "Concierge unreachable.", suggestedAction: "STAY" }), {
             status: 200, headers: { "Content-Type": "application/json", ...cors },
           });
