@@ -34,7 +34,7 @@ pip install -r requirements-dev.txt
 
 The Lovable-generated UI has Prettier formatting drift in some components; `npm run lint` may report `prettier/prettier` on files outside the integration layer. The integration files (`src/services/api.ts`, `src/lib/*`, `src/routes/api/v1/*`) follow project conventions.
 
-**Node.js:** TanStack Start requires **Node 20.19+**; **22.12+** is recommended (see `frontend/package.json` engine warnings during install).
+**Node.js:** Use **22.12.0** from repo [`.nvmrc`](../.nvmrc). `check-static.*` runs `ensure-node` before building. `frontend/package.json` sets `engines` and `engine-strict` via `.npmrc`.
 
 ## Monorepo gate
 

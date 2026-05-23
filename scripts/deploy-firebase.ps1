@@ -24,16 +24,16 @@ if (-not (Test-Path ".firebaserc")) {
     Write-Error "Missing .firebaserc. Copy .firebaserc.example or pass -ProjectId."
 }
 
+& (Join-Path $Root "scripts\ensure-node.ps1")
+
 if (-not $SkipBuild) {
     Write-Host "Building frontend..." -ForegroundColor Cyan
     Push-Location frontend
     if (Get-Command bun -ErrorAction SilentlyContinue) {
         bun install
-        $env:VITE_USE_BACKEND = "true"
         bun run build:firebase
     } else {
         npm install
-        $env:VITE_USE_BACKEND = "true"
         npm run build:firebase
     }
     Pop-Location

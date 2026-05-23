@@ -20,15 +20,15 @@ if [[ ! -f .firebaserc ]]; then
   exit 1
 fi
 
+bash "$ROOT/scripts/ensure-node.sh"
+
 echo "Building frontend..."
 cd frontend
 if command -v bun >/dev/null 2>&1; then
   bun install
-  export VITE_USE_BACKEND=true
   bun run build:firebase
 else
   npm install
-  export VITE_USE_BACKEND=true
   npm run build:firebase
 fi
 cd "$ROOT"

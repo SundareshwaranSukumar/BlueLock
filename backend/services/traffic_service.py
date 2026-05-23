@@ -4,12 +4,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import os
 import random
 from datetime import UTC, datetime
 from typing import Any
 
-import requests
 from fastapi import WebSocket
 
 from config.app_state import (
@@ -17,8 +15,9 @@ from config.app_state import (
     update_stadium_state,
 )
 from config.gate_state import get_all_gates
-from config.match_config import TOMTOM_BBOX, VENUE
+from config.match_config import VENUE
 from services.cricket_service import fetch_live_match
+from services.google_traffic_service import fetch_venue_traffic
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +78,7 @@ async def _broadcast(packet: dict[str, Any]) -> None:
 
 def _build_packet() -> dict[str, Any]:
     match = fetch_live_match()
-    traffic = _fetch_tomtom()
+    traffic = fetch_venue_traffic()
     _advance_synthetic()
     gates = _gate_payload()
     parking = _parking_payload()
@@ -109,29 +108,6 @@ def _build_packet() -> dict[str, Any]:
         "match": match,
         "traffic": traffic,
     }
-
-
-def _fetch_tomtom() -> dict[str, Any]:
-    key = os.getenv("TOMTOM_API_KEY", "").strip()
-    if not key or key == "your_tomtom_api_key_here":
-        return {"congestion_level": "synthetic", "source": "unavailable"}
-    try:
-        bbox = TOMTOM_BBOX
-        url = (
-            "https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json"
-            f"?key={key}&point={bbox['min_lat']},{bbox['min_lon']}"
-        )
-        resp = requests.get(url, timeout=6)
-        resp.raise_for_status()
-        flow = resp.json().get("flowSegmentData", {})
-        speed = flow.get("currentSpeed", 0)
-        free = flow.get("freeFlowSpeed", 1) or 1
-        ratio = speed / free
-        level = "low" if ratio > 0.75 else "moderate" if ratio > 0.5 else "heavy"
-        return {"congestion_level": level, "current_speed": speed, "source": "tomtom"}
-    except Exception:
-        logger.exception("TomTom fetch failed")
-        return {"congestion_level": "unknown", "source": "error"}
 
 
 def _advance_synthetic() -> None:

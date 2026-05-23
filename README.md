@@ -13,7 +13,7 @@ chmod +x scripts/launch.sh scripts/deploy-firebase.sh scripts/check-static.sh
 ./scripts/launch.sh
 ```
 
-1. Copy `backend/.env.template` → `backend/.env` and set `GEMINI_API_KEY` (and optional `CRICAPI_KEY`, `TOMTOM_API_KEY`).
+1. Copy `backend/.env.template` → `backend/.env` and set `GEMINI_API_KEY` (and optional `CRICAPI_KEY`, `GOOGLE_MAPS_API_KEY`).
 2. Launcher option **1** starts the backend (Docker if available, else Uvicorn) and the frontend dev server.
 3. Open the Vite URL from the terminal (port may differ from `5173`).
 
@@ -44,7 +44,7 @@ Deploy the Cloud Run backend first, then:
 .\scripts\deploy-firebase.ps1 -ProjectId your-firebase-project-id
 ```
 
-See [docs/deployment.md](docs/deployment.md) for `serviceId`, region, and Node.js version requirements.
+See [docs/deployment.md](docs/deployment.md) for `serviceId`, region, and Node.js (`.nvmrc` / `ensure-node` scripts).
 
 ## License
 

@@ -18,6 +18,7 @@ Write-Host "=== Backend: Mypy ===" -ForegroundColor Cyan
 Pop-Location
 
 Write-Host "=== Frontend: Production build ===" -ForegroundColor Cyan
+& (Join-Path $Root "scripts\ensure-node.ps1")
 Push-Location frontend
 if (Get-Command bun -ErrorAction SilentlyContinue) {
     bun install

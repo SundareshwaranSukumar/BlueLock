@@ -14,12 +14,18 @@ VENUE_CITY = "Lucknow"
 CRICAPI_TEAM_A = "Lucknow Super Giants"
 CRICAPI_TEAM_B = "Punjab Kings"
 
-# TomTom Traffic Flow bounding box (approx Ekana / Gomti Nagar)
-TOMTOM_BBOX = {
+# Ekana / Gomti Nagar area for Google Maps traffic sampling
+EKANA_TRAFFIC_BBOX = {
     "min_lat": 26.805,
     "min_lon": 80.995,
     "max_lat": 26.825,
     "max_lon": 81.020,
+}
+
+# Stadium centroid for Routes API approach vectors
+EKANA_VENUE_CENTER = {
+    "lat": 26.815,
+    "lng": 81.0075,
 }
 
 EKANA_STANDS = (

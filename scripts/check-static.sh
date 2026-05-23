@@ -19,6 +19,7 @@ echo "=== Backend: Mypy ==="
 cd "$ROOT"
 
 echo "=== Frontend: Production build ==="
+bash "$ROOT/scripts/ensure-node.sh"
 cd frontend
 if command -v bun >/dev/null 2>&1; then
   bun install

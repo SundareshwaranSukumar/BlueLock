@@ -28,3 +28,9 @@ Frontend: set `VITE_USE_BACKEND=true`; optional `VITE_TELEMETRY_WS_URL`.
 ## Env vars
 
 See `backend/.env.template`.
+
+| Variable | Purpose |
+|----------|---------|
+| `GEMINI_API_KEY` | Stadium AI assistant |
+| `CRICAPI_KEY` / `RAPIDAPI_KEY` | Live cricket scores |
+| `GOOGLE_MAPS_API_KEY` | Routes API traffic near Ekana (`GOOGLE_CLOUD_API_KEY` alias) |
