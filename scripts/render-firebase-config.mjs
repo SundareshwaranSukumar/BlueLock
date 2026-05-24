@@ -8,8 +8,8 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const templatePath = path.join(root, "firebase.json");
-const outDir = path.join(root, ".firebase");
-const outPath = path.join(outDir, "deploy-firebase.json");
+const outDir = root;
+const outPath = path.join(root, ".firebase-deploy.json");
 
 function loadEnv() {
   const envPath = path.join(root, ".env");

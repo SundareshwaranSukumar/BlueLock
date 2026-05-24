@@ -1,10 +1,10 @@
-# BlueLock — deploy backend to Cloud Run, then Firebase Hosting (recommended production path)
+# BlueLock - deploy backend to Cloud Run, then Firebase Hosting (recommended production path)
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 
 $envPath = Join-Path $Root ".env"
 if (-not (Test-Path $envPath)) {
-    throw "Missing $envPath — copy .env.template to .env"
+    throw "Missing $envPath - copy .env.template to .env"
 }
 Get-Content $envPath | ForEach-Object {
     $line = $_.Trim()

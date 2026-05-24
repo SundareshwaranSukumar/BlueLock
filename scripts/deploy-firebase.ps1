@@ -1,4 +1,4 @@
-# BlueLock — build static frontend and deploy Firebase Hosting (API via Cloud Run rewrites)
+# BlueLock - build static frontend and deploy Firebase Hosting (API via Cloud Run rewrites)
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $Root
@@ -6,7 +6,7 @@ Set-Location $Root
 function Import-RootEnv {
     $envPath = Join-Path $Root ".env"
     if (-not (Test-Path $envPath)) {
-        throw "Missing $envPath — copy .env.template to .env and fill values."
+        throw "Missing $envPath - copy .env.template to .env and fill values."
     }
     Get-Content $envPath | ForEach-Object {
         $line = $_.Trim()
@@ -23,17 +23,8 @@ function Ensure-Firebaserc {
     $project = if ($env:FIREBASE_PROJECT_ID) { $env:FIREBASE_PROJECT_ID } else { $env:GCP_PROJECT_ID }
     if (-not $project) { throw "Set FIREBASE_PROJECT_ID or GCP_PROJECT_ID in .env" }
     $rcPath = Join-Path $Root ".firebaserc"
-    if (-not (Test-Path $rcPath)) {
-        $example = Join-Path $Root ".firebaserc.example"
-        if (Test-Path $example) { Copy-Item $example $rcPath }
-        $obj = @{ projects = @{ default = $project } }
-        if (Test-Path $rcPath) {
-            $existing = Get-Content $rcPath -Raw | ConvertFrom-Json
-            if ($existing.projects) { $obj.projects = @{} + $existing.projects }
-        }
-        $obj.projects.default = $project
-        $obj | ConvertTo-Json -Depth 5 | Set-Content $rcPath -Encoding utf8
-    }
+    $obj = @{ projects = @{ default = $project } }
+    $obj | ConvertTo-Json -Depth 5 | Set-Content $rcPath -Encoding utf8
 }
 
 Import-RootEnv

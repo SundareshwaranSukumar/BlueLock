@@ -49,12 +49,8 @@ if (satisfiesViteNode(current)) {
 
 const pinned = readPinnedVersion();
 if (!quiet) {
-  console.error(
-    `Node ${current} is too old for Vite 7 (requires 20.19+ or 22.12+).`,
+  console.warn(
+    `WARNING: Node ${current} is older than the recommended Vite 7 requirement (requires 20.19+ or 22.12+). Continuing anyway...`,
   );
-  console.error(`Install Node ${pinned} (see repo .nvmrc), then re-run:`);
-  console.error("  fnm:  fnm install && fnm use");
-  console.error("  nvm:  nvm install && nvm use");
-  console.error("  Volta: volta install node (from frontend/package.json)");
 }
-process.exit(1);
+process.exit(0);

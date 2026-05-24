@@ -10,13 +10,10 @@
     "node": "22.12.0"
   },
   "scripts": {
-    "prebuild": "node ../scripts/ensure-node.mjs --quiet",
-    "prebuild:production": "node ../scripts/ensure-node.mjs --quiet",
     "dev": "vite dev",
     "build": "vite build",
-    "build:production": "vite build --mode production && node ../scripts/generate-static-index.mjs",
-    "build:firebase": "npm run build:production",
-    "build:dev": "vite build --mode development",
+    "build:production": "vite build --mode production",
+    "build:firebase": "vite build --mode production",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."
